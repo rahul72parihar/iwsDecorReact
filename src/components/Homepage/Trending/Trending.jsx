@@ -1,4 +1,5 @@
 import "./Trending.css";
+import { Link } from "react-router-dom";
 
 function Trending() {
   const products = [
@@ -58,49 +59,42 @@ function Trending() {
       <div className="trending-grid">
         {products.map((product) => (
           <div className="product-card" key={product.id}>
-            <div
-              className="product-image"
-              style={{
-                backgroundImage: `url(${product.image})`,
-              }}
+            <Link
+              to={`/products/${product.id}`}
+              className="trending-item-link"
+              aria-label={`View ${product.name} details`}
             >
-              <button className="wishlist-btn">♡</button>
-            </div>
-
-            <div className="product-content">
-              <p className="product-category">
-                {product.category}
-              </p>
-
-              <h3 className="product-name">
-                {product.name}
-              </h3>
-
-              <div className="product-rating">
-                <span className="stars">★★★★★</span>
-                <span className="reviews">
-                  ({product.reviews})
-                </span>
+              <div
+                className="product-image"
+                style={{
+                  backgroundImage: `url(${product.image})`,
+                }}
+              >
+                <button className="wishlist-btn" type="button">
+                  ♡
+                </button>
               </div>
 
-              <div className="price-row">
-                <span className="current-price">
-                  {product.price}
-                </span>
+              <div className="product-content">
+                <p className="product-category">{product.category}</p>
+                <h3 className="product-name">{product.name}</h3>
 
-                <span className="old-price">
-                  {product.oldPrice}
-                </span>
+                <div className="product-rating">
+                  <span className="stars">★★★★★</span>
+                  <span className="reviews">({product.reviews})</span>
+                </div>
 
-                <span className="discount">
-                  {product.discount}
-                </span>
+                <div className="price-row">
+                  <span className="current-price">{product.price}</span>
+                  <span className="old-price">{product.oldPrice}</span>
+                  <span className="discount">{product.discount}</span>
+                </div>
+
+                <button className="add-cart-btn" type="button">
+                  Add to Cart
+                </button>
               </div>
-
-              <button className="add-cart-btn">
-                Add to Cart
-              </button>
-            </div>
+            </Link>
           </div>
         ))}
       </div>
@@ -109,3 +103,4 @@ function Trending() {
 }
 
 export default Trending;
+

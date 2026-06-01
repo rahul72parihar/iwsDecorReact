@@ -1,0 +1,206 @@
+@media (prefers-reduced-motion: reduce){
+  .pi-btn, .pi-tabBtn, .pi-qtyBtn, .pi-stockPill{ transition: none !important; }
+}
+
+.product-info{ min-width: 0; }
+
+.pi-card{
+  border-radius: 22px;
+  border: 1px solid rgba(201,168,76,0.18);
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.06);
+  padding: 22px;
+}
+
+.pi-top{ padding-bottom: 14px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+
+.pi-cat{
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(29,24,21,0.55);
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.pi-name{
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 700;
+  font-size: 42px;
+  line-height: 1.05;
+  color: #1d1815;
+  margin-bottom: 6px;
+}
+
+.pi-brand{
+  font-weight: 800;
+  color: rgba(29,24,21,0.65);
+  margin-bottom: 12px;
+}
+
+.pi-ratingRow{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.pi-stars{ display: flex; gap: 2px; }
+.pi-star{ font-size: 16px; line-height: 1; }
+.pi-star.full{ color: #c9a84c; }
+.pi-star.half{ color: #c9a84c; opacity: 0.85; }
+.pi-star.empty{ color: rgba(201,168,76,0.25); }
+
+.pi-reviewCount{ font-weight: 800; color: rgba(29,24,21,0.6); }
+
+.pi-priceRow{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  padding: 16px 0;
+}
+
+.pi-discount{
+  align-self: start;
+  width: fit-content;
+  background: rgba(201,168,76,0.16);
+  border: 1px solid rgba(201,168,76,0.35);
+  color: #9f7f25;
+  font-weight: 900;
+  padding: 8px 12px;
+  border-radius: 999px;
+  letter-spacing: 0.4px;
+}
+
+.pi-price{ font-size: 34px; font-weight: 1000; }
+.pi-oldPrice{ color: rgba(29,24,21,0.45); text-decoration: line-through; font-weight: 900; }
+
+.pi-stock{ display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0 18px; }
+.pi-stockPill{
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-weight: 900;
+  font-size: 12px;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+.pi-stockPill.in{ background: rgba(201,168,76,0.12); border-color: rgba(201,168,76,0.35); color: #7d6315; }
+.pi-stockPill.out{ background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.14); color: rgba(29,24,21,0.6); }
+
+.pi-stockText{ color: rgba(29,24,21,0.55); font-weight: 800; }
+
+.pi-actions{ padding: 4px 0 18px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+
+.pi-qty{ display: flex; align-items: center; gap: 14px; }
+.pi-qtyBtn{
+  width: 44px; height: 44px;
+  border-radius: 14px;
+  border: 1px solid rgba(0,0,0,0.10);
+  background: rgba(255,255,255,0.6);
+  cursor: pointer;
+  font-size: 22px;
+  font-weight: 900;
+  transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+}
+.pi-qtyBtn:disabled{ opacity: 0.55; cursor: not-allowed; }
+.pi-qtyBtn:not(:disabled):hover{ transform: translateY(-2px); border-color: rgba(201,168,76,0.6); box-shadow: 0 18px 40px rgba(201,168,76,0.12); }
+
+.pi-qtyValue{ min-width: 42px; text-align: center; font-weight: 1000; font-size: 18px; color: #1d1815; }
+
+.pi-actionBtns{ margin-top: 14px; display: grid; grid-template-columns: 1fr; gap: 10px; }
+
+.pi-btn{
+  border-radius: 16px;
+  height: 52px;
+  border: 1px solid rgba(0,0,0,0.10);
+  cursor: pointer;
+  font-weight: 1000;
+  font-size: 15px;
+  transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease, border-color 220ms ease;
+}
+
+.pi-btn:disabled{ opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.pi-btn.gold{
+  background: linear-gradient(135deg, rgba(201,168,76,0.95), rgba(201,168,76,0.65));
+  border-color: rgba(201,168,76,0.65);
+  color: #1d1815;
+}
+
+.pi-btn.gold:hover:not(:disabled){
+  transform: translateY(-2px);
+  box-shadow: 0 22px 45px rgba(201,168,76,0.22);
+}
+
+.pi-btn.dark{
+  background: rgba(29,24,21,0.92);
+  color: white;
+  border-color: rgba(29,24,21,0.92);
+}
+
+.pi-btn.dark:hover:not(:disabled){
+  transform: translateY(-2px);
+  box-shadow: 0 22px 45px rgba(0,0,0,0.18);
+  border-color: rgba(201,168,76,0.55);
+}
+
+.pi-wishlist{
+  border-radius: 16px;
+  height: 48px;
+  border: 1px dashed rgba(201,168,76,0.6);
+  background: rgba(255,255,255,0.55);
+  font-weight: 900;
+  color: rgba(125,99,21,0.95);
+  cursor: pointer;
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.pi-wishlist:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 22px 45px rgba(201,168,76,0.16);
+}
+
+.pi-tabs{ padding-top: 18px; }
+
+.pi-tabList{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.pi-tabBtn{
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,0.10);
+  background: rgba(255,255,255,0.62);
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 900;
+  color: rgba(29,24,21,0.7);
+  transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease, background 200ms ease;
+}
+
+.pi-tabBtn:hover{ transform: translateY(-2px); border-color: rgba(201,168,76,0.55); box-shadow: 0 18px 40px rgba(0,0,0,0.06); }
+.pi-tabBtn.active{
+  background: rgba(201,168,76,0.18);
+  border-color: rgba(201,168,76,0.85);
+  color: rgba(29,24,21,0.95);
+}
+
+.pi-tabContent{
+  border-radius: 18px;
+  border: 1px solid rgba(0,0,0,0.06);
+  background: rgba(255,255,255,0.55);
+  padding: 16px;
+}
+
+.pi-text{ color: rgba(29,24,21,0.75); font-weight: 800; }
+
+.pi-list{ margin: 0; padding-left: 18px; }
+.pi-list li{ margin: 10px 0; color: rgba(29,24,21,0.72); font-weight: 800; }
+
+@media (max-width: 520px){
+  .pi-card{ padding: 16px; }
+  .pi-name{ font-size: 30px; }
+}
+

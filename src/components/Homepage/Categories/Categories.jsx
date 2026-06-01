@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import "./Categories.css";
 
 function Categories() {
@@ -37,7 +38,11 @@ function Categories() {
 
       <div className="categories-grid">
         {categories.map((category) => (
-          <div key={category.id} className="cat-card">
+          <Link
+            key={category.id}
+            to={`/products?category=${encodeURIComponent(category.name)}`}
+            className="cat-card"
+          >
             <div
               className="cat-img"
               style={{
@@ -49,7 +54,7 @@ function Categories() {
               <h3>{category.name}</h3>
               <p>{category.products}</p>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </section>

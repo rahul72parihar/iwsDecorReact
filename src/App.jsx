@@ -3,7 +3,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home/Home.jsx';
 
 import Products from './pages/Products/Products.jsx';
-import ProductDetails from './pages/Products/ProductDetails.jsx';
+import ProductDetails from './pages/ProductDetails/ProductDetails.jsx';
+
 
 import CategoryProducts from './pages/Categories/CategoryProducts.jsx';
 
@@ -52,6 +53,8 @@ import AdminReviews from './pages/Admin/Reviews.jsx';
 import AdminSettings from './pages/Admin/Settings.jsx';
 
 import NotFound from './pages/NotFound/NotFound.jsx';
+
+import Toasts from './components/Toasts/Toasts.jsx';
 
 export default function App() {
   return (
@@ -110,9 +113,11 @@ export default function App() {
 
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <Toasts />
     </BrowserRouter>
   );
 }
+
 
 
 

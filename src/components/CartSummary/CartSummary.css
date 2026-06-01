@@ -1,0 +1,99 @@
+.cart-summary {
+  position: sticky;
+  top: 88px;
+  align-self: start;
+}
+
+.cs-card {
+  padding: 20px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.06);
+}
+
+.cs-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 30px;
+  margin: 0;
+  color: #1d1815;
+}
+
+.cs-row {
+  margin-top: 12px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: rgba(29, 24, 21, 0.82);
+  font-weight: 800;
+}
+
+.cs-amount {
+  color: #1d1815;
+  font-weight: 950;
+}
+
+.cs-divider {
+  height: 1px;
+  background: rgba(0, 0, 0, 0.06);
+  margin-top: 14px;
+  margin-bottom: 8px;
+}
+
+.cs-total {
+  font-size: 18px;
+}
+
+.cs-btn {
+  margin-top: 16px;
+  width: 100%;
+  border: none;
+  background: #1d1815;
+  color: white;
+  padding: 14px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 900;
+  transition: 0.3s;
+}
+
+.cs-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: #000;
+}
+
+.cs-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cs-clear {
+  margin-top: 10px;
+  width: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.7);
+  color: #1d1815;
+  padding: 12px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.cs-clear:hover {
+  border-color: rgba(201, 168, 76, 0.7);
+}
+
+.cs-note {
+  margin-top: 14px;
+  color: rgba(29, 24, 21, 0.68);
+  font-weight: 800;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+@media (max-width: 900px) {
+  .cart-summary {
+    position: static;
+  }
+}
+

@@ -1,10 +1,13 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { useSelector } from 'react-redux';
 import "./Header.css";
 import HeaderSidebar from "../HeaderSidebar/HeaderSidebar";
 
 function Header() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const totalQuantity = useSelector((s) => s.cart?.totalQuantity ?? 0);
+
 
   return (
     <>
@@ -41,10 +44,10 @@ function Header() {
               <button className="icon-btn">🔍</button>
               <button className="icon-btn">🤍</button>
 
-              <button className="icon-btn cart-btn">
+              <Link to="/cart" className="icon-btn cart-btn">
                 🛒
-                <span className="cart-count">3</span>
-              </button>
+                <span className="cart-count">{totalQuantity}</span>
+              </Link>
             </div>
           </div>
         </div>

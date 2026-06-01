@@ -1,0 +1,122 @@
+.cart-page {
+  min-height: 60vh;
+}
+
+.cart-hero {
+  padding: 54px 18px 20px;
+  background:
+    radial-gradient(1200px 400px at 20% 0%, rgba(201, 168, 76, 0.22), transparent 55%),
+    radial-gradient(900px 340px at 80% 20%, rgba(29, 24, 21, 0.10), transparent 55%),
+    linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0));
+}
+
+.cart-hero-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.cart-hero-breadcrumb {
+  color: rgba(29, 24, 21, 0.65);
+  font-weight: 800;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.cart-title {
+  margin: 12px 0 8px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 54px;
+  color: #1d1815;
+  font-weight: 900;
+}
+
+.cart-count {
+  color: rgba(29, 24, 21, 0.7);
+  font-weight: 900;
+  font-size: 16px;
+}
+
+.cart-main {
+  padding: 18px;
+}
+
+.cart-main-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.cart-left {
+  min-height: 380px;
+}
+
+.cart-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cart-empty {
+  padding: 36px 18px;
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.06);
+  text-align: center;
+}
+
+.cart-empty-icon {
+  font-size: 52px;
+}
+
+.cart-empty-title {
+  margin-top: 12px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 38px;
+  color: #1d1815;
+  font-weight: 900;
+}
+
+.cart-empty-sub {
+  margin-top: 10px;
+  color: rgba(29, 24, 21, 0.68);
+  font-weight: 800;
+}
+
+.cart-empty-btn {
+  display: inline-block;
+  margin-top: 18px;
+  text-decoration: none;
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-weight: 950;
+  background: #1d1815;
+  color: white !important;
+  transition: 0.25s;
+}
+
+.cart-empty-btn:hover {
+  transform: translateY(-1px);
+  background: #000;
+}
+
+@media (max-width: 1000px) {
+  .cart-main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cart-title {
+    font-size: 44px;
+  }
+}
+
+@media (max-width: 520px) {
+  .cart-title {
+    font-size: 38px;
+  }
+}
+
