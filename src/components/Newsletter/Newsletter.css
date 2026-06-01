@@ -1,0 +1,116 @@
+.newsletter-section {
+  padding: 80px 6%;
+  background: #f8f5ef;
+}
+
+.newsletter-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+
+  background: white;
+
+  padding: 80px 60px;
+
+  border-radius: 40px;
+
+  text-align: center;
+
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+}
+
+.section-tag {
+  color: #c9a84c;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.newsletter-title {
+  font-size: 68px;
+  line-height: 1;
+  margin-bottom: 20px;
+
+  font-family: "Cormorant Garamond", serif;
+  color: #1d1815;
+}
+
+.newsletter-desc {
+  max-width: 700px;
+  margin: 0 auto 40px;
+
+  color: #6f655d;
+  font-size: 18px;
+  line-height: 1.8;
+}
+
+.newsletter-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.newsletter-input {
+  width: 420px;
+  max-width: 100%;
+
+  padding: 18px 24px;
+
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 999px;
+
+  background: #fafafa;
+
+  outline: none;
+  font-size: 15px;
+}
+
+.newsletter-input:focus {
+  border-color: #c9a84c;
+}
+
+.newsletter-btn {
+  border: none;
+
+  background: #1d1815;
+  color: white;
+
+  padding: 18px 34px;
+
+  border-radius: 999px;
+
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+
+.newsletter-btn:hover {
+  background: black;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .newsletter-inner {
+    padding: 50px 25px;
+  }
+
+  .newsletter-title {
+    font-size: 42px;
+  }
+
+  .newsletter-desc {
+    font-size: 16px;
+  }
+
+  .newsletter-form {
+    flex-direction: column;
+  }
+
+  .newsletter-input,
+  .newsletter-btn {
+    width: 100%;
+  }
+}

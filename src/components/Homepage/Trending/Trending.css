@@ -1,0 +1,158 @@
+.trending-section {
+  padding: 80px 6%;
+  background: #f8f5ef;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.section-tag {
+  color: #c9a84c;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.section-title {
+  font-size: 64px;
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 700;
+  color: #1d1815;
+}
+
+.trending-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px;
+}
+
+.product-card {
+  background: white;
+  border-radius: 30px;
+  overflow: hidden;
+  transition: 0.35s ease;
+  box-shadow: 0 10px 40px rgba(0,0,0,.06);
+}
+
+.product-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 60px rgba(0,0,0,.12);
+}
+
+.product-image {
+  height: 320px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.wishlist-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+
+  width: 44px;
+  height: 44px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: white;
+  cursor: pointer;
+
+  font-size: 18px;
+}
+
+.product-content {
+  padding: 28px;
+}
+
+.product-category {
+  color: #c9a84c;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.product-name {
+  font-size: 30px;
+  line-height: 1.1;
+  margin-bottom: 15px;
+  font-family: "Cormorant Garamond", serif;
+}
+
+.product-rating {
+  margin-bottom: 18px;
+}
+
+.stars {
+  color: #c9a84c;
+}
+
+.reviews {
+  color: #777;
+  margin-left: 8px;
+}
+
+.price-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+.current-price {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.old-price {
+  color: #999;
+  text-decoration: line-through;
+}
+
+.discount {
+  color: green;
+  font-size: 14px;
+}
+
+.add-cart-btn {
+  width: 100%;
+  border: none;
+  background: #1d1815;
+  color: white;
+  padding: 15px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: .3s;
+}
+
+.add-cart-btn:hover {
+  background: black;
+}
+
+@media (max-width: 1200px) {
+  .trending-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .trending-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-title {
+    font-size: 40px;
+  }
+
+  .product-name {
+    font-size: 24px;
+  }
+}

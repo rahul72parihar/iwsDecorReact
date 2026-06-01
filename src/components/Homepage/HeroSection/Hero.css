@@ -1,0 +1,146 @@
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6%;
+  position: relative;
+  overflow: hidden;
+
+  background-image:
+    linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.72) 0%,
+      rgba(0, 0, 0, 0.55) 35%,
+      rgba(0, 0, 0, 0.18) 65%,
+      rgba(0, 0, 0, 0.05) 100%
+    ),
+    url("https://the-next-decor.com/cdn/shop/files/4_d0d5eda9-3a5d-4005-823e-24f91a757665.jpg?v=1699338202");
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.hero-content {
+  max-width: 720px;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-sub {
+  color: #efd08a;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.hero-title {
+  font-size: 110px;
+  line-height: 0.88;
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 600;
+  margin-bottom: 30px;
+  color: white;
+}
+
+.hero-title em {
+  color: #dcb35c;
+  font-style: italic;
+}
+
+.hero-desc {
+  font-size: 20px;
+  max-width: 600px;
+  color: rgba(255, 255, 255, 0.82);
+  margin-bottom: 40px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  background: #1f1a17;
+  color: white;
+  padding: 16px 34px;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+}
+
+.btn-ghost {
+  border: 1px solid rgba(255,255,255,0.22);
+  background: rgba(255,255,255,0.08);
+  color: white;
+  backdrop-filter: blur(10px);
+  padding: 16px 34px;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.btn-ghost:hover {
+  background: rgba(255,255,255,0.18);
+}
+
+.hero-badge {
+  position: absolute;
+  right: 6%;
+  bottom: 80px;
+  width: 320px;
+  padding: 30px;
+  border-radius: 30px;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.14);
+  display: flex;
+  gap: 18px;
+}
+
+.hero-badge-line {
+  width: 4px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to bottom,
+    #f6d78d,
+    #c9a84c
+  );
+}
+
+.hero-badge-title {
+  color: white;
+  font-size: 28px;
+  margin-bottom: 8px;
+  font-family: "Cormorant Garamond", serif;
+}
+
+.hero-badge-text {
+  color: rgba(255,255,255,0.78);
+  line-height: 1.7;
+  font-size: 15px;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    min-height: 60vh;
+    padding: 50px 22px 80px;
+    align-items: flex-start;
+  }
+
+  .hero-title {
+    font-size: 58px;
+  }
+
+  .hero-badge {
+    display: none;
+  }
+}

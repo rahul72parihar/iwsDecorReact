@@ -1,0 +1,266 @@
+/* =========================
+   RESET
+========================= */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+/* =========================
+   TOPBAR
+========================= */
+
+.topbar {
+  background: #1d1815;
+  color: white;
+  text-align: center;
+  padding: 12px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.header {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 99999;
+
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(18px);
+
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.header-inner {
+  height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  max-width: 1400px;
+  margin: 0 auto;
+
+  padding: 0 5%;
+  gap: 20px;
+}
+
+/* =========================
+   LOGO
+========================= */
+
+.logo {
+  text-decoration: none;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+
+  flex-shrink: 0;
+}
+
+.logo-iws {
+  color: #111;
+  font-weight: 800;
+}
+
+.logo-decor {
+  color: #c9a84c;
+  font-weight: 800;
+}
+
+/* =========================
+   NAVIGATION
+========================= */
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  flex: 1;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 24px;
+  flex: 1;
+}
+
+.desktop-links {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.nav-link {
+  text-decoration: none;
+
+  font-size: 15px;
+  font-weight: 600;
+  color: #2c2723;
+
+  white-space: nowrap;
+
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #c9a84c;
+}
+
+/* =========================
+   ICONS
+========================= */
+
+.header-icons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon-btn {
+  width: 42px;
+  height: 42px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: white;
+
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 16px;
+
+  transition: all 0.3s ease;
+}
+
+.icon-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.cart-btn {
+  position: relative;
+}
+
+.cart-count {
+  position: absolute;
+
+  top: -4px;
+  right: -4px;
+
+  width: 18px;
+  height: 18px;
+
+  border-radius: 50%;
+
+  background: #c9a84c;
+  color: #111;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* =========================
+   MOBILE MENU BUTTON
+========================= */
+
+.mobile-menu-btn {
+  display: none;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 42px;
+  height: 42px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: white;
+
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+
+  cursor: pointer;
+
+  font-size: 20px;
+
+  transition: all 0.3s ease;
+}
+
+.mobile-menu-btn:hover {
+  transform: scale(1.05);
+}
+
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width: 1024px) {
+  .header-inner {
+    height: 76px;
+    padding: 0 22px;
+  }
+
+  .desktop-links {
+    display: none;
+  }
+
+  .mobile-menu-btn {
+    display: flex;
+  }
+
+  .header-left {
+    display: none;
+  }
+
+  .logo {
+    font-size: 34px;
+  }
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 768px) {
+  .header-inner {
+    height: 76px;
+    padding: 0 18px;
+  }
+
+  .logo {
+    font-size: 28px;
+  }
+
+  .header-icons {
+    display: none;
+  }
+}
