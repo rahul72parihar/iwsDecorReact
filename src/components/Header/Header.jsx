@@ -1,13 +1,13 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { useSelector } from 'react-redux';
+import { useSelector } from "react-redux";
 import "./Header.css";
 import HeaderSidebar from "../HeaderSidebar/HeaderSidebar";
 
 function Header() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const totalQuantity = useSelector((s) => s.cart?.totalQuantity ?? 0);
-
+  const wishlistCount = useSelector((s) => s.wishlist?.items?.length ?? 0);
 
   return (
     <>
@@ -42,7 +42,15 @@ function Header() {
 
             <div className="header-icons">
               <button className="icon-btn">🔍</button>
-              <button className="icon-btn">🤍</button>
+
+              <div className="icon-btn">
+                <Link to="/wishlist" className="wishlist-btn-header">
+                  🤍
+                  {wishlistCount > 0 ? (
+                    <span className="wishlist-count">{wishlistCount}</span>
+                  ) : null}
+                </Link>
+              </div>
 
               <Link to="/cart" className="icon-btn cart-btn">
                 🛒
@@ -57,7 +65,6 @@ function Header() {
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
-
     </>
   );
 }

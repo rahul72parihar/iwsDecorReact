@@ -21,7 +21,7 @@
 .section-title {
   font-size: 64px;
   font-family: "Cormorant Garamond", serif;
-  font-weight: 400;
+  font-weight: 700;
   color: #1d1815;
 }
 
@@ -37,6 +37,8 @@
   overflow: hidden;
   transition: 0.35s ease;
   box-shadow: 0 10px 40px rgba(0,0,0,.06);
+  display: flex !important;
+  flex-direction: column !important;
 }
 
 .product-card:hover {
@@ -45,6 +47,7 @@
 }
 
 .product-image {
+  flex: 1 !important;
   width: 100%;
   background-size: cover;
   background-position: center;
@@ -69,7 +72,10 @@
 }
 
 .product-content {
-  padding: 28px;
+  padding: 22px;
+  flex: 1 !important;
+  display: flex;
+  flex-direction: column;
 }
 
 .product-category {
@@ -89,7 +95,7 @@
 }
 
 .product-rating {
-  margin-bottom: 18px;
+  margin-bottom: 8px;
 }
 
 .stars {
@@ -106,7 +112,7 @@
   gap: 10px;
   align-items: center;
   flex-wrap: wrap;
-  margin-bottom: 22px;
+  margin-bottom: 8px;
 }
 
 .current-price {
@@ -133,6 +139,7 @@
   border-radius: 999px;
   cursor: pointer;
   transition: .3s;
+  margin-top: auto !important;
 }
 
 .add-cart-btn:hover {

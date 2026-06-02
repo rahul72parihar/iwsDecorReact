@@ -188,3 +188,39 @@
   }
 }
 
+.mobile-filter-btn {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-filter-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 14px 18px;
+
+    border: none;
+    border-radius: 999px;
+
+    background: #c9a84c;
+    color: #111;
+
+    font-weight: 700;
+    font-size: 15px;
+
+    cursor: pointer;
+  }
+
+  .filters-wrapper {
+    display: none;
+    margin-bottom: 20px;
+  }
+
+  .filters-wrapper.filters-open {
+    display: block;
+  }
+}
+

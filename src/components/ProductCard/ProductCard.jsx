@@ -1,6 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
+import { useSelector } from 'react-redux';
+
 import { Link } from 'react-router-dom';
 import './ProductCard.css';
+
 
 function StarRow({ rating }) {
   const rounded = Math.max(0, Math.min(5, Math.round(rating * 2) / 2));
@@ -29,7 +32,11 @@ function StarRow({ rating }) {
 }
 
 export default function ProductCard({ product, onAddToCart, onToggleWishlist }) {
-  const [wishlisted, setWishlisted] = useState(false);
+  const wishlistItems = useSelector((s) => s.wishlist?.items ?? []);
+  const wishlisted = wishlistItems.some((i) => i.id === product?.id);
+
+
+
 
   const discountLabel = useMemo(() => {
     if (!product?.discountPercent) return null;
@@ -37,9 +44,9 @@ export default function ProductCard({ product, onAddToCart, onToggleWishlist }) 
   }, [product]);
 
   const handleWishlist = () => {
-    setWishlisted((v) => !v);
     onToggleWishlist?.(product);
   };
+
 
   const handleAdd = () => {
     onAddToCart?.(product);
@@ -55,10 +62,13 @@ export default function ProductCard({ product, onAddToCart, onToggleWishlist }) 
           className="wishlist-btn"
           onClick={handleWishlist}
           aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+
           type="button"
         >
           {wishlisted ? '♥' : '♡'}
+
         </button>
+
 
         {discountLabel ? <div className="discount-badge">{discountLabel}</div> : null}
       </div>

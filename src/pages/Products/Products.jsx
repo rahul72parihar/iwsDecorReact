@@ -1,17 +1,19 @@
-import { useMemo, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { addToCart } from '../../features/cart/cartSlice';
-import { pushAutoToast } from '../../store/toastSlice';
-import Header from '../../components/Header/Header';
-import Footer from '../../components/Footer/Footer';
+import { useMemo, useState } from "react";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../../features/cart/cartSlice";
+import { toggleWishlist } from "../../features/wishlist/wishlistSlice";
+import { pushAutoToast } from "../../store/toastSlice";
 
-import ProductCard from '../../components/ProductCard/ProductCard';
-import ProductFilters from '../../components/ProductFilters/ProductFilters';
-import ProductToolbar from '../../components/ProductToolbar/ProductToolbar';
+import Header from "../../components/Header/Header";
+import Footer from "../../components/Footer/Footer";
 
-import { products as allProducts } from '../../data/products';
+import ProductCard from "../../components/ProductCard/ProductCard";
+import ProductFilters from "../../components/ProductFilters/ProductFilters";
+import ProductToolbar from "../../components/ProductToolbar/ProductToolbar";
 
-import './Products.css';
+import { products as allProducts } from "../../data/products";
+
+import "./Products.css";
 
 function clamp(n, min, max) {
   return Math.max(min, Math.min(max, n));
@@ -32,22 +34,24 @@ const priceBounds = (items) => {
 export default function Products() {
   const bounds = useMemo(() => priceBounds(allProducts), []);
 
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [selectedCategories, setSelectedCategories] = useState(() => {
     // If homepage category card clicked: /products?category=...
     // We store it in the same state shape as ProductFilters expects.
     const params = new URLSearchParams(window.location.search);
-    const c = params.get('category');
+    const c = params.get("category");
     return c ? [c] : [];
   });
 
   const [priceMin, setPriceMin] = useState(bounds.min);
   const [priceMax, setPriceMax] = useState(bounds.max);
 
-  const [availability, setAvailability] = useState('all'); // all | in | out
+  const [availability, setAvailability] = useState("all"); // all | in | out
   const [ratingMin, setRatingMin] = useState(0);
 
-  const [sort, setSort] = useState('featured');
+  const [sort, setSort] = useState("featured");
+
+  const [showFilters, setShowFilters] = useState(false);
 
   // Category card selection from Homepage: /products?category=...
   // We initialize `selectedCategories` from that querystring above.
@@ -71,12 +75,18 @@ export default function Products() {
         p.category.toLowerCase().includes(q);
 
       const matchesCategory =
-        selectedCategories.length === 0 || selectedCategories.includes(p.category);
+        selectedCategories.length === 0 ||
+        selectedCategories.includes(p.category);
 
-      const matchesPrice = p.price >= normalizedPrice.min && p.price <= normalizedPrice.max;
+      const matchesPrice =
+        p.price >= normalizedPrice.min && p.price <= normalizedPrice.max;
 
       const matchesAvailability =
-        availability === 'all' ? true : availability === 'in' ? p.inStock : !p.inStock;
+        availability === "all"
+          ? true
+          : availability === "in"
+            ? p.inStock
+            : !p.inStock;
 
       const matchesRating = p.rating >= ratingMin;
 
@@ -99,15 +109,17 @@ export default function Products() {
 
     arr.sort((a, b) => {
       switch (sort) {
-        case 'newest':
+        case "newest":
           return scoreNewest(b) - scoreNewest(a) || b.id - a.id;
-        case 'priceLow':
+        case "priceLow":
           return a.price - b.price;
-        case 'priceHigh':
+        case "priceHigh":
           return b.price - a.price;
-        case 'bestSelling':
-          return scoreBestSelling(b) - scoreBestSelling(a) || b.rating - a.rating;
-        case 'featured':
+        case "bestSelling":
+          return (
+            scoreBestSelling(b) - scoreBestSelling(a) || b.rating - a.rating
+          );
+        case "featured":
         default:
           return scoreFeatured(b) - scoreFeatured(a) || b.rating - a.rating;
       }
@@ -138,20 +150,29 @@ export default function Products() {
         image: product.image,
         category: product.category,
         price: product.price,
-      })
+      }),
     );
 
     dispatch(
       pushAutoToast({
-        type: 'success',
-        title: 'Added to cart',
+        type: "success",
+        title: "Added to cart",
         message: product.name,
-      })
+      }),
     );
   };
 
-  const onToggleWishlist = () => {
-    // Production-ready UI only.
+  const onToggleWishlist = (product) => {
+    if (!product) return;
+    dispatch(toggleWishlist(product));
+
+    dispatch(
+      pushAutoToast({
+        type: "success",
+        title: "Wishlist updated",
+        message: product.name,
+      }),
+    );
   };
 
   const pageNumbers = useMemo(() => {
@@ -184,40 +205,50 @@ export default function Products() {
 
         <section className="products-layout">
           <div className="products-layout-grid">
-            <ProductFilters
-              search={search}
-              setSearch={(v) => {
-                setSearch(v);
-                setPage(1);
-              }}
-              selectedCategories={selectedCategories}
-              setSelectedCategories={(v) => {
-                setSelectedCategories(v);
-                setPage(1);
-              }}
-              priceMin={priceMin}
-              priceMax={priceMax}
-              setPriceMin={(v) => {
-                setPriceMin(v);
-                setPage(1);
-              }}
-              setPriceMax={(v) => {
-                setPriceMax(v);
-                setPage(1);
-              }}
-              availability={availability}
-              setAvailability={(v) => {
-                setAvailability(v);
-                setPage(1);
-              }}
-              ratingMin={ratingMin}
-              setRatingMin={(v) => {
-                setRatingMin(v);
-                setPage(1);
-              }}
-              minPossiblePrice={bounds.min}
-              maxPossiblePrice={bounds.max}
-            />
+            <button
+              className="mobile-filter-btn"
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              {showFilters ? "Hide Filters" : "Show Filters"}
+            </button>
+            <div
+              className={`filters-wrapper ${showFilters ? "filters-open" : ""}`}
+            >
+              <ProductFilters
+                search={search}
+                setSearch={(v) => {
+                  setSearch(v);
+                  setPage(1);
+                }}
+                selectedCategories={selectedCategories}
+                setSelectedCategories={(v) => {
+                  setSelectedCategories(v);
+                  setPage(1);
+                }}
+                priceMin={priceMin}
+                priceMax={priceMax}
+                setPriceMin={(v) => {
+                  setPriceMin(v);
+                  setPage(1);
+                }}
+                setPriceMax={(v) => {
+                  setPriceMax(v);
+                  setPage(1);
+                }}
+                availability={availability}
+                setAvailability={(v) => {
+                  setAvailability(v);
+                  setPage(1);
+                }}
+                ratingMin={ratingMin}
+                setRatingMin={(v) => {
+                  setRatingMin(v);
+                  setPage(1);
+                }}
+                minPossiblePrice={bounds.min}
+                maxPossiblePrice={bounds.max}
+              />
+            </div>
 
             <main>
               <ProductToolbar
@@ -241,32 +272,32 @@ export default function Products() {
               </div>
 
               {sorted.length === 0 ? (
-                <div style={{ marginTop: 28, textAlign: 'center' }}>
+                <div style={{ marginTop: 28, textAlign: "center" }}>
                   <div
                     style={{
                       fontFamily: "'Cormorant Garamond', serif",
                       fontSize: 44,
-                      color: '#1d1815',
+                      color: "#1d1815",
                       marginBottom: 10,
                       fontWeight: 800,
                     }}
                   >
                     No matches found
                   </div>
-                  <div style={{ color: 'rgba(29,24,21,0.7)', fontWeight: 700 }}>
+                  <div style={{ color: "rgba(29,24,21,0.7)", fontWeight: 700 }}>
                     Try adjusting filters or search terms.
                   </div>
                 </div>
               ) : null}
 
-              <div className="pagination" aria-label="Pagination">
+              {totalPages > 1 && <div className="pagination" aria-label="Pagination">
                 <button
                   className="page-btn"
                   type="button"
                   disabled={safePage <= 1}
                   onClick={() => {
                     setPage((p) => Math.max(1, p - 1));
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
                 >
                   Previous
@@ -277,10 +308,10 @@ export default function Products() {
                     <button
                       key={n}
                       type="button"
-                      className={`page-number ${n === safePage ? 'active' : ''}`}
+                      className={`page-number ${n === safePage ? "active" : ""}`}
                       onClick={() => {
                         setPage(n);
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
                     >
                       {n}
@@ -294,12 +325,12 @@ export default function Products() {
                   disabled={safePage >= totalPages}
                   onClick={() => {
                     setPage((p) => Math.min(totalPages, p + 1));
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
                 >
                   Next
                 </button>
-              </div>
+              </div>}
             </main>
           </div>
         </section>
@@ -309,5 +340,3 @@ export default function Products() {
     </>
   );
 }
-
-

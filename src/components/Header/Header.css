@@ -159,13 +159,18 @@ body {
   transform: translateY(-2px);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
-
+.wishlist-btn-header{
+  position: relative;
+}
 .cart-btn {
   position: relative;
 }
 
-.cart-count {
+.cart-count,
+.wishlist-count {
+
   position: absolute;
+
 
   top: -4px;
   right: -4px;
