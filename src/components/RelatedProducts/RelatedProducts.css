@@ -43,7 +43,7 @@
   background: rgba(201,168,76,0.18);
   border: 1px solid rgba(201,168,76,0.38);
   color: #9f7f25;
-  font-weight: 1000;
+  font-weight: 600;
   padding: 8px 12px;
   border-radius: 999px;
   font-size: 12px;
@@ -72,14 +72,14 @@
 .rp-nameLink{ display: block; padding: 16px 16px 0; text-decoration: none; color: inherit; }
 .rp-name{
   font-family: 'Cormorant Garamond', serif;
-  font-weight: 700;
+  font-weight: 500;
   font-size: 22px;
   line-height: 1.1;
   margin-bottom: 10px;
 }
 
 .rp-ratingRow{ padding: 0 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
-.rp-reviewCount{ color: rgba(29,24,21,0.55); font-weight: 900; font-size: 13px; }
+.rp-reviewCount{ color: rgba(29,24,21,0.55); font-weight: 600; font-size: 13px; }
 
 .rp-stars{ display: flex; gap: 2px; }
 .rp-star{ font-size: 15px; }
@@ -88,8 +88,8 @@
 .rp-star.empty{ color: rgba(201,168,76,0.25); }
 
 .rp-priceRow{ padding: 0 16px; display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; }
-.rp-price{ font-weight: 1000; font-size: 18px; }
-.rp-old{ color: rgba(29,24,21,0.45); text-decoration: line-through; font-weight: 900; font-size: 14px; }
+.rp-price{ font-weight: 600; font-size: 18px; }
+.rp-old{ color: rgba(29,24,21,0.45); text-decoration: line-through; font-weight: 600; font-size: 14px; }
 
 .rp-addBtn{
   margin: 0 16px 16px;
@@ -98,7 +98,7 @@
   border-radius: 16px;
   border: 1px solid rgba(0,0,0,0.10);
   cursor: pointer;
-  font-weight: 1000;
+  font-weight: 600;
   background: rgba(29,24,21,0.92);
   color: white;
   transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
