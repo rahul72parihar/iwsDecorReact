@@ -66,7 +66,7 @@
 
 .btn-primary {
   background: #1f1a17;
-  color: white;
+  color: white!important;
   padding: 16px 34px;
   border-radius: 999px;
   text-decoration: none;
@@ -80,7 +80,7 @@
 .btn-ghost {
   border: 1px solid rgba(255,255,255,0.22);
   background: rgba(255,255,255,0.08);
-  color: white;
+  color: white !important;
   backdrop-filter: blur(10px);
   padding: 16px 34px;
   border-radius: 999px;

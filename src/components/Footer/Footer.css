@@ -22,8 +22,8 @@
   font-weight: 700;
 }
 
-.logo-iws {
-  color: white;
+.footer-logo .logo-iws {
+  color: white !important;
 }
 
 .logo-decor {

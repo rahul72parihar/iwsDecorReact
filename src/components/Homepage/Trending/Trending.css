@@ -1,5 +1,6 @@
 .trending-section {
   padding: 80px 6%;
+  padding-top: 0px;
   background: #f8f5ef;
 }
 
@@ -44,7 +45,7 @@
 }
 
 .product-image {
-  height: 320px;
+  width: 100%;
   background-size: cover;
   background-position: center;
   position: relative;

@@ -46,6 +46,7 @@
 
 .cat-img {
   height: 320px;
+  width: 100%;
   background-size: cover;
   background-position: center;
 }
@@ -85,7 +86,7 @@
   }
 
   .cat-img {
-    height: 260px;
+    height: 300px;
   }
 
   .cat-info h3 {
