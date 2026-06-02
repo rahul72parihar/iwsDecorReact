@@ -34,7 +34,7 @@
   text-transform: uppercase;
   letter-spacing: 1.8px;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .cart-item-name {
@@ -43,12 +43,12 @@
   font-size: 26px;
   line-height: 1.1;
   color: #1d1815;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .cart-item-price {
   color: rgba(29, 24, 21, 0.9);
-  font-weight: 900;
+  font-weight: 600;
   font-size: 16px;
   padding-top: 4px;
 }
@@ -75,7 +75,7 @@
   background: rgba(255, 255, 255, 0.9);
   cursor: pointer;
   font-size: 22px;
-  font-weight: 900;
+  font-weight: 600;
   color: #1d1815;
   transition: 0.2s;
 }
@@ -93,7 +93,7 @@
 .cart-qty-value {
   min-width: 32px;
   text-align: center;
-  font-weight: 900;
+  font-weight: 600;
   font-size: 18px;
 }
 
@@ -101,14 +101,14 @@
   text-align: right;
   justify-self: end;
   color: rgba(29, 24, 21, 0.75);
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .cart-item-subtotalValue {
   margin-top: 4px;
   color: #1d1815;
   font-size: 18px;
-  font-weight: 950;
+  font-weight: 550;
 }
 
 .cart-remove {
@@ -118,7 +118,7 @@
   color: #1d1815;
   padding: 10px 14px;
   border-radius: 999px;
-  font-weight: 900;
+  font-weight: 600;
   cursor: pointer;
   transition: 0.2s;
 }

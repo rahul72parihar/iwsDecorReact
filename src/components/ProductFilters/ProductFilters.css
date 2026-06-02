@@ -16,7 +16,7 @@
 
 .filters-title {
   font-family: 'Cormorant Garamond', serif;
-  font-weight: 800;
+  font-weight: 600;
   font-size: 34px;
   margin-bottom: 16px;
 }
@@ -26,7 +26,7 @@
 }
 
 .filter-label {
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.2px;
   margin-bottom: 10px;
   color: #1d1815;
@@ -40,7 +40,7 @@
   border: 1px solid rgba(0, 0, 0, 0.12);
   background: rgba(248, 245, 239, 0.7);
   outline: none;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .filter-input:focus {
@@ -58,7 +58,7 @@
   display: flex;
   gap: 10px;
   align-items: center;
-  font-weight: 700;
+  font-weight: 400;
   color: #2b2623;
 }
 
@@ -71,7 +71,7 @@
 .price-label {
   margin-top: 6px;
   color: #c9a84c;
-  font-weight: 900;
+  font-weight: 700;
   font-size: 14px;
 }
 
@@ -89,7 +89,7 @@
   margin-top: 8px;
   color: rgba(29, 24, 21, 0.7);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .rating-row {
@@ -101,7 +101,7 @@
 .rating-value {
   min-width: 74px;
   text-align: right;
-  font-weight: 900;
+  font-weight: 700;
   color: #c9a84c;
 }
 

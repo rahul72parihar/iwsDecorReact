@@ -17,7 +17,7 @@
 
 .cart-hero-breadcrumb {
   color: rgba(29, 24, 21, 0.65);
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 1.6px;
   text-transform: uppercase;
   font-size: 12px;
@@ -28,12 +28,12 @@
   font-family: 'Cormorant Garamond', serif;
   font-size: 54px;
   color: #1d1815;
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .cart-count {
   color: rgba(29, 24, 21, 0.7);
-  font-weight: 500;
+  font-weight: 400;
   font-size: 12px;
 }
 
@@ -84,7 +84,7 @@
 .cart-empty-sub {
   margin-top: 10px;
   color: rgba(29, 24, 21, 0.68);
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .cart-empty-btn {
@@ -93,7 +93,7 @@
   text-decoration: none;
   border-radius: 999px;
   padding: 12px 18px;
-  font-weight: 950;
+  font-weight: 600;
   background: #1d1815;
   color: white !important;
   transition: 0.25s;

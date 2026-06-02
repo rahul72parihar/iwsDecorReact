@@ -25,12 +25,12 @@
   justify-content: space-between;
   gap: 12px;
   color: rgba(29, 24, 21, 0.82);
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .cs-amount {
   color: #1d1815;
-  font-weight: 950;
+  font-weight: 550;
 }
 
 .cs-divider {
@@ -53,7 +53,7 @@
   padding: 14px 16px;
   border-radius: 999px;
   cursor: pointer;
-  font-weight: 900;
+  font-weight: 600;
   transition: 0.3s;
 }
 
@@ -76,7 +76,7 @@
   padding: 12px 16px;
   border-radius: 999px;
   cursor: pointer;
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .cs-clear:hover {
@@ -86,7 +86,7 @@
 .cs-note {
   margin-top: 14px;
   color: rgba(29, 24, 21, 0.68);
-  font-weight: 800;
+  font-weight: 600;
   font-size: 13px;
   line-height: 1.35;
 }
