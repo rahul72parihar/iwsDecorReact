@@ -1,34 +1,29 @@
 import "./Marquee.css";
 
 function Marquee() {
+  const items = [
+    "Handcrafted Brass",
+    "Premium Decor",
+    "Luxury Lighting",
+    "50,000+ Happy Homes",
+    "Handcrafted Brass",
+    "Premium Decor",
+    "Luxury Lighting",
+    "50,000+ Happy Homes",
+  ];
+
   return (
     <div className="marquee-wrap">
       <div className="marquee-track">
-        <span>Handcrafted Brass</span>
-        <span className="dot">✦</span>
-
-        <span>Premium Decor</span>
-        <span className="dot">✦</span>
-
-        <span>Luxury Lighting</span>
-        <span className="dot">✦</span>
-
-        <span>50,000+ Happy Homes</span>
-        <span className="dot">✦</span>
-
-        {/* Duplicate for smooth loop */}
-
-        <span>Handcrafted Brass</span>
-        <span className="dot">✦</span>
-
-        <span>Premium Decor</span>
-        <span className="dot">✦</span>
-
-        <span>Luxury Lighting</span>
-        <span className="dot">✦</span>
-
-        <span>50,000+ Happy Homes</span>
-        <span className="dot">✦</span>
+        {[...items, ...items].map((item, index) => (
+          <div
+            key={index}
+            style={{ display: "flex", alignItems: "center", gap: "28px" }}
+          >
+            <span>{item}</span>
+            <span className="dot">✦</span>
+          </div>
+        ))}
       </div>
     </div>
   );
