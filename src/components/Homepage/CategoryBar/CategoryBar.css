@@ -3,6 +3,8 @@
   border-top: 1px solid #eee;
   border-bottom: 1px solid #eee;
   position: relative;
+  /* width: 100%;
+  overflow-y: hidden; */
 }
 
 .category-container {
@@ -37,7 +39,7 @@
   left: 0;
 
   background: white;
-  min-width: 520px;
+  min-width: 250px;
 
   padding: 25px;
   display: flex;
