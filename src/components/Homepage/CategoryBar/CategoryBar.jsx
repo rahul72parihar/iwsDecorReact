@@ -1,106 +1,77 @@
 import { Link } from "react-router-dom";
+import { products } from "../../../data/products.js";
 import "./CategoryBar.css";
+
+// Build nav structure directly from product data
+const toSlug = (str) =>
+  str.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+
+const buildNavCategories = () => {
+  const map = {};
+  products.forEach(({ category, subcategory }) => {
+    if (!map[category]) map[category] = new Set();
+    if (subcategory) map[category].add(subcategory);
+  });
+  return Object.entries(map).map(([category, subs]) => ({
+    label: category,
+    slug: toSlug(category),
+    subcategories: [...subs].map((sub) => ({
+      label: sub,
+      slug: toSlug(sub),
+    })),
+  }));
+};
+
+const DATA_CATEGORIES = buildNavCategories();
+
+// Split product categories into groups of ~3 for multi-column mega menus
+const chunkArray = (arr, size) => {
+  const chunks = [];
+  for (let i = 0; i < arr.length; i += size) chunks.push(arr.slice(i, i + size));
+  return chunks;
+};
+
+function ProductCategoryMegaMenu({ category }) {
+  const columns = chunkArray(category.subcategories, 4);
+  return (
+    <div className="mega-menu">
+      {columns.map((col, ci) => (
+        <div className="mega-column" key={ci}>
+          <h4>
+            <Link to={`/categories/${category.slug}`}>{category.label}</Link>
+          </h4>
+          {col.map((sub) => (
+            <Link
+              key={sub.slug}
+              to={`/categories/${category.slug}?sub=${sub.slug}`}
+            >
+              {sub.label}
+            </Link>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 
 function CategoryBar() {
   return (
     <div className="category-bar">
       <div className="category-container">
-        <Link to="/" className="category-link">
-          Living Room
-        </Link>
 
-        {/* BEDROOM */}
-        <div className="category-item">
-          <span className="category-link">
-            Bedroom
-          </span>
-
-          <div className="mega-menu">
-            <div className="mega-column">
-              <h4>Beds</h4>
-              <Link to="/">King Size Beds</Link>
-              <Link to="/">Queen Size Beds</Link>
-              <Link to="/">Storage Beds</Link>
-            </div>
-
-            <div className="mega-column">
-              <h4>Wardrobes</h4>
-              <Link to="/">2 Door</Link>
-              <Link to="/">3 Door</Link>
-              <Link to="/">Sliding Wardrobes</Link>
-            </div>
+        {/* Product-data-driven categories: Lighting, Decor, etc. */}
+        {DATA_CATEGORIES.map((cat) => (
+          <div className="category-item" key={cat.slug}>
+            <Link to={`/categories/${cat.slug}`} className="category-link">
+              {cat.label}
+            </Link>
+            {cat.subcategories.length > 0 && (
+              <ProductCategoryMegaMenu category={cat} />
+            )}
           </div>
-        </div>
+        ))}
 
-        <Link to="/" className="category-link">
-          Dining
-        </Link>
-
-        {/* OFFICE */}
-        <div className="category-item">
-          <span className="category-link">
-            Office
-          </span>
-
-          <div className="mega-menu">
-            <div className="mega-column">
-              <h4>Office Chairs</h4>
-              <Link to="/">Gaming Chairs</Link>
-              <Link to="/">Ergonomic Chairs</Link>
-              <Link to="/">Executive Chairs</Link>
-            </div>
-
-            <div className="mega-column">
-              <h4>Tables</h4>
-              <Link to="/">Study Tables</Link>
-              <Link to="/">Computer Tables</Link>
-              <Link to="/">Standing Desks</Link>
-            </div>
-          </div>
-        </div>
-
-        <Link to="/" className="category-link">
-          Kitchen
-        </Link>
-
-        <Link to="/" className="category-link">
-          Lighting
-        </Link>
-
-        <Link to="/" className="category-link">
-          Decor
-        </Link>
-
-        {/* OUTDOOR */}
-        <div className="category-item">
-          <span className="category-link">
-            Outdoor
-          </span>
-
-          <div className="mega-menu">
-            <div className="mega-column">
-              <h4>Garden</h4>
-              <Link to="/">Garden Chairs</Link>
-              <Link to="/">Outdoor Tables</Link>
-              <Link to="/">Swings</Link>
-            </div>
-
-            <div className="mega-column">
-              <h4>Balcony</h4>
-              <Link to="/">Balcony Sets</Link>
-              <Link to="/">Planters</Link>
-              <Link to="/">Lighting</Link>
-            </div>
-          </div>
-        </div>
-
-        <Link to="/" className="category-link">
-          Kids
-        </Link>
-
-        <Link to="/" className="category-link">
-          Sale
-        </Link>
       </div>
     </div>
   );
