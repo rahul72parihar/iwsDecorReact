@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import './ProductGallery.css';
 
@@ -27,12 +28,82 @@ export default function ProductGallery({ product }) {
 
   const active = images[activeIndex] ?? images[0];
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalImage, setModalImage] = useState(null);
+
+  useEffect(() => {
+    if (!isModalOpen) return;
+
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setIsModalOpen(false);
+        setModalImage(null);
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isModalOpen]);
+
+  const openModalForActive = () => {
+    if (!active) return;
+    setModalImage(active);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setModalImage(null);
+  };
+
+  const modalNode =
+    isModalOpen && modalImage
+      ? createPortal(
+          <div
+            className="pg-modalOverlay"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Product image preview"
+            onMouseDown={(e) => {
+              // Close only when user clicks the overlay (not the image card)
+              if (e.target === e.currentTarget) closeModal();
+            }}
+          >
+            <div className="pg-modalCard">
+              <button
+                type="button"
+                className="pg-modalClose"
+                aria-label="Close image preview"
+                onClick={closeModal}
+              >
+                ×
+              </button>
+
+              <img className="pg-modalImg" src={modalImage.src} alt={modalImage.alt} />
+            </div>
+          </div>,
+          document.body,
+        )
+      : null;
+
   return (
     <div className="product-gallery" aria-label="Product gallery">
+      {modalNode}
+
       <div className="gallery-mainWrap">
         <div className="gallery-main">
           {active ? (
-            <img className="gallery-mainImg" src={active.src} alt={active.alt} />
+            <img
+              className="gallery-mainImg"
+              src={active.src}
+              alt={active.alt}
+              role="button"
+              tabIndex={0}
+              onClick={openModalForActive}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') openModalForActive();
+              }}
+            />
           ) : null}
           <div className="gallery-zoomHint">Hover to zoom</div>
         </div>

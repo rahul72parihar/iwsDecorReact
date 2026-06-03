@@ -12,7 +12,7 @@
   inset: 0;
   background: rgba(0, 0, 0, 0.42);
   backdrop-filter: blur(6px);
-  z-index: 999998;
+  z-index: 998;
 }
 
 .header-sidebar {
@@ -22,7 +22,7 @@
   max-width: 88vw;
   height: 100vh;
   overflow-y: auto;
-  z-index: 999999;
+  z-index: 999;
 
   background: var(--sidebar-bg);
   border-right: 1px solid var(--sidebar-border);
