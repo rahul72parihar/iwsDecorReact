@@ -1,53 +1,19 @@
 import "./Trending.css";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
+import { addToCart } from "../../../features/cart/cartSlice";
+import { toggleWishlist } from "../../../features/wishlist/wishlistSlice";
+import { products as allProducts } from "../../../data/products";
+import { pushAutoToast } from "../../../store/toastSlice";
+
 function Trending() {
-  const products = [
-    {
-      id: 1,
-      category: "Table Lamps",
-      name: "Velvet Brass Lamp",
-      price: "₹4,299",
-      oldPrice: "₹5,999",
-      discount: "22% OFF",
-      reviews: 104,
-      image:
-        "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200&auto=format&fit=crop",
-    },
-    {
-      id: 2,
-      category: "Pendant Lights",
-      name: "Modern Hanging Light",
-      price: "₹6,499",
-      oldPrice: "₹7,899",
-      discount: "18% OFF",
-      reviews: 88,
-      image:
-        "https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=1200&auto=format&fit=crop",
-    },
-    {
-      id: 3,
-      category: "Chandeliers",
-      name: "Luxury Crystal Chandelier",
-      price: "₹18,999",
-      oldPrice: "₹24,999",
-      discount: "24% OFF",
-      reviews: 201,
-      image:
-        "https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=1200&auto=format&fit=crop",
-    },
-    {
-      id: 4,
-      category: "Wall Decor",
-      name: "Brass Wall Sconce",
-      price: "₹8,499",
-      oldPrice: "₹10,999",
-      discount: "19% OFF",
-      reviews: 52,
-      image:
-        "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=1200&auto=format&fit=crop",
-    },
-  ];
+  const dispatch = useDispatch();
+  const wishlistItems = useSelector((s) => s.wishlist?.items ?? []);
+
+
+  // Use real catalog products so Redux payloads match what reducers expect.
+  const products = allProducts.slice(0, 4);
 
   return (
     <section className="trending-section">
@@ -70,12 +36,38 @@ function Trending() {
                   backgroundImage: `url(${product.image})`,
                 }}
               >
-                <button className="wishlist-btn" type="button">
-                  ♡
+                <button
+                  className="wishlist-btn"
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dispatch(toggleWishlist(product));
+
+                    const afterIsWishlisted = !wishlistItems.some(
+                      (i) => i.id === product.id,
+                    );
+
+                    dispatch(
+                      pushAutoToast({
+                        type: "success",
+                        title: afterIsWishlisted
+                          ? "Added to wishlist"
+                          : "Removed from wishlist",
+                        message: product.name,
+                      }),
+                    );
+                  }}
+
+                  aria-label="Toggle wishlist"
+                >
+                  {wishlistItems.some((i) => i.id === product.id) ? "♥" : "♡"}
+
                 </button>
               </div>
 
               <div className="product-content">
+
                 <p className="product-category">{product.category}</p>
                 <h3 className="product-name">{product.name}</h3>
 
@@ -90,9 +82,37 @@ function Trending() {
                   <span className="discount">{product.discount}</span>
                 </div>
 
-                <button className="add-cart-btn" type="button">
-                  Add to Cart
+                <button
+                  className="add-cart-btn"
+                  type="button"
+                  disabled={!product.inStock}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (!product.inStock) return;
+
+                    dispatch(
+                      addToCart({
+                        id: product.id,
+                        name: product.name,
+                        image: product.image,
+                        category: product.category,
+                        price: product.price,
+                      }),
+                    );
+                    dispatch(
+                      pushAutoToast({
+                        type: "success",
+                        title: "Added to cart",
+                        message: product.name,
+                      })
+                    );
+
+                  }}
+                >
+                  {product.inStock ? "Add to Cart" : "Unavailable"}
                 </button>
+
               </div>
             </Link>
           </div>
