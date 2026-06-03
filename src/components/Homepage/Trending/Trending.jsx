@@ -74,11 +74,13 @@ function Trending() {
 
                 <div className="product-rating">
                   <span className="stars">★★★★★</span>
-                  <span className="reviews">({product.reviews})</span>
+                  {product.reviews && (
+                    <span className="reviews">({product.reviews})</span>
+                  )}
                 </div>
 
                 <div className="price-row">
-                  <span className="current-price">{product.price}</span>
+                  <span className="current-price">₹{product.price}</span>
                   <span className="old-price">{product.oldPrice}</span>
                   <span className="discount">{product.discount}</span>
                 </div>
