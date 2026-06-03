@@ -31,13 +31,13 @@ function Header() {
 
           <div className="header-right">
             <nav className="desktop-links">
-              <Link to="/brass-collection" className="nav-link">
-                Brass Collection
+              <Link to="/products" className="nav-link">
+                All Products
               </Link>
 
-              <Link to="/new-arrivals" className="nav-link">
+              {/* <Link to="/new-arrivals" className="nav-link">
                 New Arrivals
-              </Link>
+              </Link> */}
             </nav>
 
             <div className="header-icons">
