@@ -1,43 +1,44 @@
-import { useMemo, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useMemo, useState } from "react";
+import { useDispatch } from "react-redux";
+import { useParams } from "react-router-dom";
 
-import { addToCart } from '../../features/cart/cartSlice';
-import { pushAutoToast } from '../../store/toastSlice';
+import { addToCart } from "../../features/cart/cartSlice";
+import { pushAutoToast } from "../../store/toastSlice";
 
-import Header from '../../components/Header/Header';
-import Footer from '../../components/Footer/Footer';
+import Header from "../../components/Header/Header";
+import Footer from "../../components/Footer/Footer";
 
-import { products as allProducts } from '../../data/products';
+import { products as allProducts } from "../../data/products";
 
-import ProductGallery from '../../components/ProductGallery/ProductGallery';
-import ProductInfo from '../../components/ProductInfo/ProductInfo';
-import Reviews from '../../components/Reviews/Reviews';
-import RelatedProducts from '../../components/RelatedProducts/RelatedProducts';
+import ProductGallery from "../../components/ProductGallery/ProductGallery";
+import ProductInfo from "../../components/ProductInfo/ProductInfo";
+import ProductDescription from "../../components/ProductDescription/ProductDescription";
+import Reviews from "../../components/Reviews/Reviews";
+import RelatedProducts from "../../components/RelatedProducts/RelatedProducts";
 
-import './ProductDetails.css';
+import "./ProductDetails.css";
 
 const DUMMY_REVIEWS = [
   {
-    id: 'r1',
-    name: 'Anaya Sharma',
+    id: "r1",
+    name: "Anaya Sharma",
     rating: 5,
-    text: 'Absolutely stunning craftsmanship. The gold accents look even more premium in person.',
-    date: '2026-02-18',
+    text: "Absolutely stunning craftsmanship. The gold accents look even more premium in person.",
+    date: "2026-02-18",
   },
   {
-    id: 'r2',
-    name: 'Rahul Mehta',
+    id: "r2",
+    name: "Rahul Mehta",
     rating: 4,
-    text: 'Elegant design and the finish is top-notch. Great addition to our living room.',
-    date: '2026-01-29',
+    text: "Elegant design and the finish is top-notch. Great addition to our living room.",
+    date: "2026-01-29",
   },
   {
-    id: 'r3',
-    name: 'Priya Nair',
+    id: "r3",
+    name: "Priya Nair",
     rating: 5,
-    text: 'Looks luxurious and feels high-quality. Delivery was smooth and fast.',
-    date: '2025-12-11',
+    text: "Looks luxurious and feels high-quality. Delivery was smooth and fast.",
+    date: "2025-12-11",
   },
 ];
 
@@ -45,7 +46,11 @@ function formatDate(iso) {
   const d = new Date(iso);
   // fallback for invalid dates
   if (Number.isNaN(d.getTime())) return iso;
-  return d.toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: '2-digit' });
+  return d.toLocaleDateString("en-IN", {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+  });
 }
 
 export default function ProductDetails() {
@@ -55,12 +60,15 @@ export default function ProductDetails() {
     return Number.isFinite(n) ? n : null;
   }, [productId]);
 
-  const product = useMemo(() => allProducts.find((p) => p.id === id) ?? null, [id]);
+  const product = useMemo(
+    () => allProducts.find((p) => p.id === id) ?? null,
+    [id],
+  );
 
   const dispatch = useDispatch();
 
   const [qty, setQty] = useState(1);
-  const [activeTab, setActiveTab] = useState('description');
+  const [activeTab, setActiveTab] = useState("description");
 
   const reviews = useMemo(() => {
     if (!product) return [];
@@ -69,8 +77,10 @@ export default function ProductDetails() {
     const rotated = DUMMY_REVIEWS.map((r, idx) => ({
       ...r,
       id: `${r.id}-${seed}-${idx}`,
-      rating: Math.max(3, Math.min(5, r.rating - (seed + idx) % 2)),
-      date: new Date(Date.parse(r.date) + (seed % 9) * 86400000).toISOString().slice(0, 10),
+      rating: Math.max(3, Math.min(5, r.rating - ((seed + idx) % 2))),
+      date: new Date(Date.parse(r.date) + (seed % 9) * 86400000)
+        .toISOString()
+        .slice(0, 10),
     }));
     return rotated;
   }, [product]);
@@ -78,41 +88,47 @@ export default function ProductDetails() {
   const productTabs = useMemo(() => {
     if (!product) return [];
     const specs = [
-      { label: 'Material', value: 'Brass finish with premium-grade components' },
-      { label: 'Finish', value: 'Champagne gold tone with anti-glare coating' },
-      { label: 'Style', value: 'Luxury statement decor' },
-      { label: 'Recommended Use', value: `${product.category} styling for living spaces & entryways` },
+      {
+        label: "Material",
+        value: "Brass finish with premium-grade components",
+      },
+      { label: "Finish", value: "Champagne gold tone with anti-glare coating" },
+      { label: "Style", value: "Luxury statement decor" },
+      {
+        label: "Recommended Use",
+        value: `${product.category} styling for living spaces & entryways`,
+      },
     ];
 
     return [
       {
-        key: 'description',
-        title: 'Description',
-        content: product.description ?? (
-          `Elevate your interiors with the ${product.name}. Crafted for timeless elegance, it brings warm illumination and a refined luxury aesthetic to any space.`
-        ),
+        key: "description",
+        title: "Description",
+        content:
+          product.description ??
+          `Elevate your interiors with the ${product.name}. Crafted for timeless elegance, it brings warm illumination and a refined luxury aesthetic to any space.`,
       },
       {
-        key: 'specifications',
-        title: 'Specifications',
+        key: "specifications",
+        title: "Specifications",
         content: specs,
       },
       {
-        key: 'care',
-        title: 'Care Instructions',
+        key: "care",
+        title: "Care Instructions",
         content: [
-          'Wipe gently with a soft, dry cloth to preserve the premium finish.',
-          'Avoid abrasive cleaners and direct harsh chemicals.',
-          'For best results, keep away from prolonged direct moisture.',
+          "Wipe gently with a soft, dry cloth to preserve the premium finish.",
+          "Avoid abrasive cleaners and direct harsh chemicals.",
+          "For best results, keep away from prolonged direct moisture.",
         ],
       },
       {
-        key: 'shipping',
-        title: 'Shipping Information',
+        key: "shipping",
+        title: "Shipping Information",
         content: [
-          'Packed with protective materials to ensure safe transit.',
-          'Ships within 2–4 business days.',
-          'Delivery timelines vary by location; we keep you updated via email.',
+          "Packed with protective materials to ensure safe transit.",
+          "Ships within 2–4 business days.",
+          "Delivery timelines vary by location; we keep you updated via email.",
         ],
       },
     ];
@@ -143,7 +159,9 @@ export default function ProductDetails() {
           <div className="product-details-hero-inner">
             <div className="breadcrumb">IWS Decor • Products</div>
             <h1 className="product-details-h1">{product.name}</h1>
-            <p className="product-details-sub">{product.category} • {product.brand ?? 'IWS Signature'}</p>
+            <p className="product-details-sub">
+              {product.category} • {product.brand ?? "IWS Signature"}
+            </p>
           </div>
         </section>
 
@@ -169,15 +187,15 @@ export default function ProductDetails() {
                       image: product.image,
                       category: product.category,
                       price: product.price,
-                    })
+                    }),
                   );
 
                   dispatch(
                     pushAutoToast({
-                      type: 'success',
-                      title: 'Added to cart',
+                      type: "success",
+                      title: "Added to cart",
                       message: product.name,
-                    })
+                    }),
                   );
                 }}
               />
@@ -185,11 +203,21 @@ export default function ProductDetails() {
           </div>
         </section>
 
+        <section className="product-details-description">
+          <ProductDescription
+            description={product.description}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            tabs={productTabs}
+          />
+        </section>
+
         <section className="product-details-reviews">
           <div className="section-head">
             <h2 className="section-title">Customer Reviews</h2>
             <div className="section-sub">
-              <span className="gold">{product.rating.toFixed(1)}</span> rating • {product.reviewsCount.toLocaleString('en-IN')} reviews
+              <span className="gold">{product.rating.toFixed(1)}</span> rating •{" "}
+              {product.reviewsCount.toLocaleString("en-IN")} reviews
             </div>
           </div>
 
@@ -199,7 +227,9 @@ export default function ProductDetails() {
         <section className="product-details-related">
           <div className="section-head">
             <h2 className="section-title">Related Products</h2>
-            <div className="section-sub">Curated styles inspired by your selection.</div>
+            <div className="section-sub">
+              Curated styles inspired by your selection.
+            </div>
           </div>
 
           <RelatedProducts currentProduct={product} />
@@ -210,4 +240,3 @@ export default function ProductDetails() {
     </>
   );
 }
-
