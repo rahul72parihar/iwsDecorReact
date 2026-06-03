@@ -50,9 +50,9 @@
   align-items: start;
 }
 
-.cart-left {
+/* .cart-left {
   min-height: 380px;
-}
+} */
 
 .cart-list {
   display: flex;
