@@ -42,16 +42,10 @@ function Header() {
 
             <div className="header-icons">
               <button className="icon-btn">🔍</button>
-
-              <div className="icon-btn">
-                <Link to="/wishlist" className="wishlist-btn-header">
-                  🤍
-                  {wishlistCount > 0 ? (
-                    <span className="wishlist-count">{wishlistCount}</span>
-                  ) : null}
-                </Link>
-              </div>
-
+              <Link to="/wishlist" className="icon-btn wishlist-btn-header">
+                🤍
+                <span className="wishlist-count">{wishlistCount}</span>
+              </Link>
               <Link to="/cart" className="icon-btn cart-btn">
                 🛒
                 <span className="cart-count">{totalQuantity}</span>

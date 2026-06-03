@@ -159,10 +159,8 @@ body {
   transform: translateY(-2px);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
-.wishlist-btn-header{
-  position: relative;
-}
-.cart-btn {
+
+.cart-btn , .wishlist-btn-header{
   position: relative;
 }
 
@@ -178,12 +176,12 @@ body {
   width: 18px;
   height: 18px;
 
-  border-radius: 50%;
-
+  border-radius: 50% !important;
+  font-family: "Inter", sans-serif !important;
   background: #c9a84c;
-  color: #111;
+  color: #111!important;
 
-  font-size: 10px;
+  font-size: 10px !important;
   font-weight: 400;
 
   display: flex;
