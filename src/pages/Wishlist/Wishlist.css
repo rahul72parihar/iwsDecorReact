@@ -16,7 +16,6 @@
 .wishlist-breadcrumb {
   color: rgba(29, 24, 21, 0.65);
   font-weight: 700;
-  letter-spacing: 0.2px;
   font-size: 14px;
   margin-bottom: 10px;
 }
@@ -29,74 +28,15 @@
   margin: 0;
 }
 
-.wishlist-main {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 22px 5% 0;
-}
-
-.wishlist-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 18px;
-}
-
-@media (min-width: 768px) {
-  .wishlist-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.wishlist-empty {
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  border-radius: 18px;
-  padding: 30px;
-  text-align: center;
-}
-
-.wishlist-empty-icon {
-  font-size: 44px;
-  margin-bottom: 12px;
-}
-
-.wishlist-empty-title {
-  font-size: 22px;
-  font-weight: 900;
-  color: #1d1815;
-  margin-bottom: 8px;
-}
-
-.wishlist-empty-sub {
-  color: rgba(29, 24, 21, 0.72);
-  font-weight: 650;
-  margin-bottom: 16px;
-}
-
-.wishlist-empty-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  padding: 12px 18px;
-  border-radius: 999px;
-  font-weight: 800;
-  background: #c9a84c;
-  color: #111;
-}
-
-.flex-row{
+.flex-row {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  gap: 20px;
 }
-
 
 .wishlist-actions {
   display: flex;
-  justify-content: flex-end;
-  margin-bottom: 20px;
 }
 
 .wishlist-clear-btn {
@@ -107,9 +47,159 @@
   font-weight: 800;
   background: #111;
   color: #fff;
-  transition: 0.2s ease;
+  transition: 0.2s;
 }
 
 .wishlist-clear-btn:hover {
   transform: translateY(-2px);
+}
+
+.wishlist-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 5%;
+}
+
+/* EMPTY STATE */
+
+.wishlist-empty {
+  background: #fff;
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.wishlist-empty-icon {
+  font-size: 48px;
+  margin-bottom: 14px;
+}
+
+.wishlist-empty-title {
+  font-size: 24px;
+  font-weight: 900;
+  color: #1d1815;
+  margin-bottom: 8px;
+}
+
+.wishlist-empty-sub {
+  color: rgba(29, 24, 21, 0.72);
+  margin-bottom: 20px;
+}
+
+.wishlist-empty-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: #c9a84c;
+  color: #111;
+  font-weight: 800;
+}
+
+/* LIST */
+
+.wishlist-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.wishlist-item {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 16px;
+  background: #fff;
+  border-radius: 18px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.04);
+}
+
+.wishlist-item-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+
+.wishlist-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.wishlist-item-category {
+  color: #c9a84c;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.wishlist-item-name {
+  margin: 6px 0;
+  font-size: 24px;
+  line-height: 1.1;
+  color: #1d1815;
+  font-family: "Cormorant Garamond", serif;
+}
+
+.wishlist-item-price {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1d1815;
+}
+
+.wishlist-remove-btn {
+  border: none;
+  background: rgba(29, 24, 21, 0.06);
+  color: #1d1815;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.wishlist-remove-btn:hover {
+  background: rgba(201, 168, 76, 0.18);
+}
+
+/* MOBILE */
+
+@media (max-width: 768px) {
+  .wishlist-title {
+    font-size: 34px;
+  }
+
+  .flex-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .wishlist-item {
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .wishlist-item-image {
+    width: 72px;
+    height: 72px;
+  }
+
+  .wishlist-item-name {
+    font-size: 18px;
+  }
+
+  .wishlist-item-price {
+    font-size: 14px;
+  }
+
+  .wishlist-remove-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
 }

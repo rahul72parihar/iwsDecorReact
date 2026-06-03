@@ -6,9 +6,9 @@ import {
   toggleWishlist,
   clearWishlist,
 } from "../../features/wishlist/wishlistSlice";
+
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
-import ProductCard from "../../components/ProductCard/ProductCard";
 
 import { pushAutoToast } from "../../store/toastSlice";
 
@@ -19,7 +19,6 @@ export default function Wishlist() {
   const items = useSelector((s) => s.wishlist?.items ?? []);
 
   const hasItems = items.length > 0;
-
   const title = useMemo(() => "Wishlist", []);
 
   return (
@@ -30,8 +29,10 @@ export default function Wishlist() {
         <section className="wishlist-hero">
           <div className="wishlist-hero-inner">
             <div className="wishlist-breadcrumb">IWS Decor • Wishlist</div>
+
             <div className="flex-row">
               <h1 className="wishlist-title">{title}</h1>
+
               {hasItems && (
                 <div className="wishlist-actions">
                   <button
@@ -44,8 +45,8 @@ export default function Wishlist() {
                           type: "success",
                           title: "Wishlist cleared",
                           message: "All items removed",
-                          link: '/wishlist',
-                        }),
+                          link: "/wishlist",
+                        })
                       );
                     }}
                   >
@@ -56,41 +57,66 @@ export default function Wishlist() {
             </div>
           </div>
         </section>
+
         <section className="wishlist-main">
           {!hasItems ? (
-            <div className="wishlist-empty" role="status" aria-live="polite">
-              <div className="wishlist-empty-icon" aria-hidden="true">
-                🤍
+            <div className="wishlist-empty">
+              <div className="wishlist-empty-icon">🤍</div>
+
+              <div className="wishlist-empty-title">
+                Your wishlist is empty
               </div>
-              <div className="wishlist-empty-title">Your wishlist is empty</div>
+
               <div className="wishlist-empty-sub">
                 Save products you love and come back anytime.
               </div>
+
               <Link to="/products" className="wishlist-empty-btn">
                 Continue Shopping
               </Link>
             </div>
           ) : (
-            <div className="wishlist-grid">
+            <div className="wishlist-list">
               {items.map((p) => (
-                <ProductCard
-                  key={p.id}
-                  product={p}
-                  onAddToCart={() => {
-                    // keep wishlist page focused; user can add from product card.
-                  }}
-                  onToggleWishlist={(product) => {
-                    dispatch(toggleWishlist(product));
-                    dispatch(
-                      pushAutoToast({
-                        type: "success",
-                        title: "Wishlist updated",
-                        message: product.name,
-                        link: '/wishlist',
-                      }),
-                    );
-                  }}
-                />
+                <div key={p.id} className="wishlist-item">
+                  <img
+                    src={p.image}
+                    alt={p.name}
+                    className="wishlist-item-image"
+                  />
+
+                  <div className="wishlist-item-content">
+                    <div className="wishlist-item-category">
+                      {p.category}
+                    </div>
+
+                    <h3 className="wishlist-item-name">
+                      {p.name}
+                    </h3>
+
+                    <div className="wishlist-item-price">
+                      ₹{p.price.toLocaleString()}
+                    </div>
+                  </div>
+
+                  <button
+                    className="wishlist-remove-btn"
+                    onClick={() => {
+                      dispatch(toggleWishlist(p));
+
+                      dispatch(
+                        pushAutoToast({
+                          type: "success",
+                          title: "Removed from wishlist",
+                          message: p.name,
+                          link: "/wishlist",
+                        })
+                      );
+                    }}
+                  >
+                    Remove
+                  </button>
+                </div>
               ))}
             </div>
           )}
