@@ -49,4 +49,5 @@
 .pi-description {
   margin: 18px auto;
   width: 88%;
+  max-width: 1180px;
 }

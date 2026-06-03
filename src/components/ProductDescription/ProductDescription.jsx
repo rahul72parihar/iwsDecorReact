@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-
 import './ProductDescription.css';
 
 export default function ProductDescription({
@@ -10,7 +8,6 @@ export default function ProductDescription({
   return (
     <div className="product-description-wrapper" aria-label="Product information">
       <div className="pi-description">
-
         <div className="pi-tabs" aria-label="Product details tabs">
           <div className="pi-tabList">
             {tabs.map((t) => (
@@ -32,9 +29,30 @@ export default function ProductDescription({
                 <div key={t.key}>
                   {Array.isArray(t.content) ? (
                     <ul className="pi-list">
-                      {t.content.map((line) => (
-                        <li key={line}>{line}</li>
-                      ))}
+                      {t.content.map((item, idx) => {
+                        // item can be a string/number (bullets) OR an object (specifications)
+                        if (item == null) {
+                          return <li key={`null-${idx}`} />;
+                        }
+
+                        const isObject = typeof item === 'object';
+
+                        if (!isObject) {
+                          const key = `line-${String(item)}-${idx}`;
+                          return <li key={key}>{item}</li>;
+                        }
+
+                        const label = item.label ?? item.title ?? 'Item';
+                        const value = item.value ?? item.description ?? '';
+                        const key = `obj-${String(label)}-${idx}`;
+
+                        return (
+                          <li key={key}>
+                            <strong>{label}</strong>
+                            {value !== '' ? `: ${value}` : null}
+                          </li>
+                        );
+                      })}
                     </ul>
                   ) : (
                     <div className="pi-text">{t.content}</div>

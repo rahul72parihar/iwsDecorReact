@@ -1,15 +1,11 @@
 import { useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
-
 import { addToCart } from "../../features/cart/cartSlice";
 import { pushAutoToast } from "../../store/toastSlice";
-
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
-
 import { products as allProducts } from "../../data/products";
-
 import ProductGallery from "../../components/ProductGallery/ProductGallery";
 import ProductInfo from "../../components/ProductInfo/ProductInfo";
 import ProductDescription from "../../components/ProductDescription/ProductDescription";
