@@ -1,5 +1,5 @@
 .products-page {
-  padding-bottom: 80px;
+  /* padding-bottom: 80px; */
 }
 
 .products-hero {
@@ -223,4 +223,22 @@
     display: block;
   }
 }
+@media (min-width: 901px) {
+  .filters-wrapper {
+    position: sticky;
+    top: 100px;
+    align-self: start;
 
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+  }
+
+  .filters-wrapper::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .filters-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(201, 168, 76, 0.6);
+    border-radius: 999px;
+  }
+}
