@@ -1,6 +1,11 @@
 import { useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { toggleWishlist } from '../../features/wishlist/wishlistSlice';
+import { pushAutoToast } from '../../store/toastSlice';
 
 import './ProductInfo.css';
+
 
 function Stars({ rating }) {
   const safe = Math.max(0, Math.min(5, rating));
@@ -34,6 +39,13 @@ export default function ProductInfo({
   tabs,
   onAddToCart,
 }) {
+  const dispatch = useDispatch();
+
+  const wishlistItems = useSelector((s) => s.wishlist?.items ?? []);
+  const isInWishlist = product
+    ? wishlistItems.some((p) => p.id === product.id)
+    : false;
+
   const priceRow = useMemo(() => {
     if (!product) return null;
     return {
@@ -108,9 +120,26 @@ export default function ProductInfo({
             <button type="button" className="pi-btn dark" disabled={!product.inStock}>
               Buy Now
             </button>
-            <button type="button" className="pi-wishlist" aria-label="Add to wishlist">
-              ♡ Add to Wishlist
+            <button
+              type="button"
+              className="pi-wishlist"
+              aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+              disabled={!product?.inStock}
+              onClick={() => {
+                if (!product) return;
+                dispatch(toggleWishlist(product));
+                dispatch(
+                  pushAutoToast({
+                    type: 'success',
+                    title: 'Wishlist updated',
+                    message: product.name,
+                  }),
+                );
+              }}
+            >
+              {isInWishlist ? '♥ In Wishlist' : '♡ Add to Wishlist'}
             </button>
+
           </div>
         </div>
       </div>
