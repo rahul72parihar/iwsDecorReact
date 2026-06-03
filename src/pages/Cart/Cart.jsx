@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 
 import CartItem from '../../components/CartItem/CartItem';
 import CartSummary from '../../components/CartSummary/CartSummary';
-
+import Header from '../../components/Header/Header';
+import Footer from '../../components/Footer/Footer';
 import './Cart.css';
 
 export default function Cart() {
@@ -19,6 +20,7 @@ export default function Cart() {
 
   return (
     <div className="cart-page">
+      <Header/>
       <section className="cart-hero">
         <div className="cart-hero-inner">
           <div className="cart-hero-breadcrumb">IWS Decor • Cart</div>
@@ -52,6 +54,7 @@ export default function Cart() {
           </div>
         </div>
       </section>
+      <Footer />
     </div>
   );
 }
