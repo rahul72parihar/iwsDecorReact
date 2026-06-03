@@ -93,7 +93,7 @@ export default function CartItem({ item }) {
             Subtotal
             <div className="cart-item-subtotalValue">₹{subtotal.toLocaleString('en-IN')}</div>
           </div>
-
+          {/* <div className="white-text">.</div> */}
           <button
             type="button"
             className="cart-remove"

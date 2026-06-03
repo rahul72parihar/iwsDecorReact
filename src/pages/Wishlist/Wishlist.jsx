@@ -1,16 +1,18 @@
-import { useMemo } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { useMemo } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
 
-import { toggleWishlist } from '../../features/wishlist/wishlistSlice';
+import {
+  toggleWishlist,
+  clearWishlist,
+} from "../../features/wishlist/wishlistSlice";
+import Header from "../../components/Header/Header";
+import Footer from "../../components/Footer/Footer";
+import ProductCard from "../../components/ProductCard/ProductCard";
 
-import Header from '../../components/Header/Header';
-import Footer from '../../components/Footer/Footer';
-import ProductCard from '../../components/ProductCard/ProductCard';
+import { pushAutoToast } from "../../store/toastSlice";
 
-import { pushAutoToast } from '../../store/toastSlice';
-
-import './Wishlist.css';
+import "./Wishlist.css";
 
 export default function Wishlist() {
   const dispatch = useDispatch();
@@ -18,7 +20,7 @@ export default function Wishlist() {
 
   const hasItems = items.length > 0;
 
-  const title = useMemo(() => 'Wishlist', []);
+  const title = useMemo(() => "Wishlist", []);
 
   return (
     <>
@@ -28,10 +30,31 @@ export default function Wishlist() {
         <section className="wishlist-hero">
           <div className="wishlist-hero-inner">
             <div className="wishlist-breadcrumb">IWS Decor • Wishlist</div>
-            <h1 className="wishlist-title">{title}</h1>
+            <div className="flex-row">
+              <h1 className="wishlist-title">{title}</h1>
+              {hasItems && (
+                <div className="wishlist-actions">
+                  <button
+                    className="wishlist-clear-btn"
+                    onClick={() => {
+                      dispatch(clearWishlist());
+
+                      dispatch(
+                        pushAutoToast({
+                          type: "success",
+                          title: "Wishlist cleared",
+                          message: "All items removed",
+                        }),
+                      );
+                    }}
+                  >
+                    Clear Wishlist
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </section>
-
         <section className="wishlist-main">
           {!hasItems ? (
             <div className="wishlist-empty" role="status" aria-live="polite">
@@ -59,10 +82,10 @@ export default function Wishlist() {
                     dispatch(toggleWishlist(product));
                     dispatch(
                       pushAutoToast({
-                        type: 'success',
-                        title: 'Wishlist updated',
+                        type: "success",
+                        title: "Wishlist updated",
                         message: product.name,
-                      })
+                      }),
                     );
                   }}
                 />
@@ -76,5 +99,3 @@ export default function Wishlist() {
     </>
   );
 }
-
-

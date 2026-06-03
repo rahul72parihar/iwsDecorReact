@@ -85,3 +85,31 @@
   color: #111;
 }
 
+.flex-row{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+.wishlist-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.wishlist-clear-btn {
+  border: none;
+  cursor: pointer;
+  padding: 12px 18px;
+  border-radius: 999px;
+  font-weight: 800;
+  background: #111;
+  color: #fff;
+  transition: 0.2s ease;
+}
+
+.wishlist-clear-btn:hover {
+  transform: translateY(-2px);
+}
