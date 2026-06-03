@@ -17,19 +17,20 @@ const toastSlice = createSlice({
   reducers: {
     pushToast: {
       reducer(state, action) {
-        const { id, type, title, message } = action.payload;
-        state.toasts.push({ id, type, title, message });
+        const { id, type, title, message, link } = action.payload;
+        state.toasts.push({ id, type, title, message, link });
         if (state.toasts.length > TOAST_LIMIT) {
           state.toasts.splice(0, state.toasts.length - TOAST_LIMIT);
         }
       },
-      prepare({ type = 'info', title, message }) {
+      prepare({ type = 'info', title, message, link }) {
         return {
           payload: {
             id: makeId(),
             type,
             title,
             message,
+            link,
           },
         };
       },

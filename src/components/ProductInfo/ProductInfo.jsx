@@ -133,6 +133,7 @@ export default function ProductInfo({
                     type: 'success',
                     title: 'Wishlist updated',
                     message: product.name,
+                    link: '/wishlist',
                   }),
                 );
               }}

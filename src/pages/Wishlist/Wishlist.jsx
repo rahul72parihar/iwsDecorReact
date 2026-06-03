@@ -44,6 +44,7 @@ export default function Wishlist() {
                           type: "success",
                           title: "Wishlist cleared",
                           message: "All items removed",
+                          link: '/wishlist',
                         }),
                       );
                     }}
@@ -85,6 +86,7 @@ export default function Wishlist() {
                         type: "success",
                         title: "Wishlist updated",
                         message: product.name,
+                        link: '/wishlist',
                       }),
                     );
                   }}

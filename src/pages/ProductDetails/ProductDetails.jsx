@@ -191,6 +191,7 @@ export default function ProductDetails() {
                       type: "success",
                       title: "Added to cart",
                       message: product.name,
+                      link: '/cart',
                     }),
                   );
                 }}

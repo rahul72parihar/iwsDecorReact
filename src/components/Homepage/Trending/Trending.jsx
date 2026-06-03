@@ -55,6 +55,7 @@ function Trending() {
                           ? "Added to wishlist"
                           : "Removed from wishlist",
                         message: product.name,
+                        link: `/wishlist`,
                       }),
                     );
                   }}
@@ -105,6 +106,7 @@ function Trending() {
                         type: "success",
                         title: "Added to cart",
                         message: product.name,
+                        link: '/cart',
                       })
                     );
 

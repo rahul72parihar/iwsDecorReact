@@ -158,6 +158,7 @@ export default function Products() {
         type: "success",
         title: "Added to cart",
         message: product.name,
+        link: '/cart',
       }),
     );
   };
@@ -171,6 +172,7 @@ export default function Products() {
         type: "success",
         title: "Wishlist updated",
         message: product.name,
+        link: '/wishlist',
       }),
     );
   };

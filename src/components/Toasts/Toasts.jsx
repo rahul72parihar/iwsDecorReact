@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { removeToast } from '../../store/toastSlice';
@@ -9,7 +10,6 @@ export default function Toasts() {
   const dispatch = useDispatch();
   const toasts = useSelector((s) => s.toast?.toasts ?? []);
 
-  // Safety: if tabs freeze timers, still allow manual cleanup by TTL handled by setTimeout in pushAutoToast.
   useEffect(() => {
     return () => {
       // no-op
@@ -27,10 +27,33 @@ export default function Toasts() {
           role="status"
         >
           <div className="toast-dot" aria-hidden="true" />
-          <div className="toast-body">
-            {t.title ? <div className="toast-title">{t.title}</div> : null}
-            {t.message ? <div className="toast-message">{t.message}</div> : null}
-          </div>
+
+          {t.link ? (
+            <Link
+              to={t.link}
+              className="toast-body toast-link"
+              onClick={() => dispatch(removeToast(t.id))}
+            >
+              {t.title ? (
+                <div className="toast-title">{t.title}</div>
+              ) : null}
+
+              {t.message ? (
+                <div className="toast-message">{t.message}</div>
+              ) : null}
+            </Link>
+          ) : (
+            <div className="toast-body">
+              {t.title ? (
+                <div className="toast-title">{t.title}</div>
+              ) : null}
+
+              {t.message ? (
+                <div className="toast-message">{t.message}</div>
+              ) : null}
+            </div>
+          )}
+
           <button
             type="button"
             className="toast-close"
@@ -44,4 +67,3 @@ export default function Toasts() {
     </div>
   );
 }
-
