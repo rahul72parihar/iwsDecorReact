@@ -351,7 +351,7 @@ export const products = [
     name: 'Hammered Brass Bowl',
     category: 'Brass Decor',
     subcategory: 'Decorative Trays',
-    image: 'https://images.unsplash.com/photo-1604430456579-4d0c6e45e4b3?w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=600&q=80',
     price: 8999,
     oldPrice: 11999,
     discountPercent: 25,
