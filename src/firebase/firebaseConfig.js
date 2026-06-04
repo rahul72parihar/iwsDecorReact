@@ -15,6 +15,7 @@ const firebaseConfig = {
     import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
   appId:
     import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: "G-NGNPBMYXXL"
 };
 
 

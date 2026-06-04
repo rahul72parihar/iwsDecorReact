@@ -58,14 +58,19 @@ import NotFound from './pages/NotFound/NotFound.jsx';
 import Toasts from './components/Toasts/Toasts.jsx';
 import AuthProvider from './auth/AuthProvider.jsx';
 
+import CartWishlistSyncMount from './features/cart/cartWishlistSyncMount.jsx';
+
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <ScrollToTop />
+        <CartWishlistSyncMount />
         <Routes>
 
+
         <Route path="/" element={<Home />} />
+
 
         <Route path="/products" element={<Products />} />
         <Route path="/products/:productId" element={<ProductDetails />} />
@@ -119,10 +124,12 @@ export default function App() {
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Toasts />
-    </BrowserRouter>
+      </BrowserRouter>
     </AuthProvider>
   );
 }
+
+
 
 
 
