@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { Link } from 'react-router-dom';
 
+import Header from '../../components/Header/Header.jsx';
 import auth from '../../firebase/firebaseAuth';
+
+import './AuthPages.css';
 
 export default function Register() {
   const [email, setEmail] = useState('');
@@ -9,6 +13,7 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -36,77 +41,65 @@ export default function Register() {
   };
 
   return (
-    <div style={{ padding: 24, maxWidth: 520, margin: '0 auto' }}>
-      <h1 style={{ marginBottom: 8 }}>Register</h1>
-      <p style={{ marginTop: 0, marginBottom: 18, color: 'rgba(29,24,21,0.7)', fontWeight: 700 }}>
-        Create your account.
-      </p>
+    <div>
+      <Header />
 
-      <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <span style={{ fontWeight: 700, color: '#1d1815' }}>Email</span>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            placeholder="you@example.com"
-            style={{ padding: '12px 14px', borderRadius: 14, border: '1px solid rgba(0,0,0,0.12)' }}
-          />
-        </label>
+      <div className="auth-page">
+        <div className="auth-layout auth-layout--single">
+          <section className="auth-card">
+            <h1>Register</h1>
+            <p className="auth-subtitle">Create your account.</p>
 
-        <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <span style={{ fontWeight: 700, color: '#1d1815' }}>Password</span>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            placeholder="At least 6 characters"
-            style={{ padding: '12px 14px', borderRadius: 14, border: '1px solid rgba(0,0,0,0.12)' }}
-          />
-        </label>
+            <form onSubmit={onSubmit} className="auth-form">
+              <label className="auth-field">
+                <span className="auth-label">Email</span>
+                <input
+                  className="auth-input"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  placeholder="you@example.com"
+                />
+              </label>
 
-        <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <span style={{ fontWeight: 700, color: '#1d1815' }}>Confirm Password</span>
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            placeholder="Repeat password"
-            style={{ padding: '12px 14px', borderRadius: 14, border: '1px solid rgba(0,0,0,0.12)' }}
-          />
-        </label>
+              <label className="auth-field">
+                <span className="auth-label">Password</span>
+                <input
+                  className="auth-input"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  placeholder="At least 6 characters"
+                />
+              </label>
 
-        {error ? (
-          <div style={{ color: '#b00020', fontWeight: 800 }}>{error}</div>
-        ) : null}
+              <label className="auth-field">
+                <span className="auth-label">Confirm Password</span>
+                <input
+                  className="auth-input"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  placeholder="Repeat password"
+                />
+              </label>
 
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            marginTop: 8,
-            padding: '12px 16px',
-            borderRadius: 14,
-            border: '1px solid rgba(0,0,0,0.12)',
-            background: loading ? 'rgba(201,168,76,0.4)' : '#c9a84c',
-            color: '#1d1815',
-            fontWeight: 800,
-            cursor: loading ? 'not-allowed' : 'pointer',
-          }}
-        >
-          {loading ? 'Creating…' : 'Register'}
-        </button>
+              {error ? <div className="auth-error">{error}</div> : null}
 
-        <div style={{ marginTop: 6, fontWeight: 700, color: 'rgba(29,24,21,0.7)' }}>
-          Already have an account?{' '}
-          <a href="/login" style={{ color: '#c9a84c' }}>
-            Login
-          </a>
+              <button type="submit" disabled={loading} className="auth-primary-btn">
+                {loading ? 'Creating…' : 'Register'}
+              </button>
+
+              <div className="auth-footer">
+                Already have an account? <Link to="/login">Login</Link>
+              </div>
+            </form>
+          </section>
         </div>
-      </form>
+      </div>
     </div>
   );
 }
