@@ -1,13 +1,41 @@
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+
+import auth from "../../firebase/firebaseAuth";
+
 import "./Header.css";
 import HeaderSidebar from "../HeaderSidebar/HeaderSidebar";
 
 function Header() {
+  const navigate = useNavigate();
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [user, setUser] = useState(null);
+
   const totalQuantity = useSelector((s) => s.cart?.totalQuantity ?? 0);
   const wishlistCount = useSelector((s) => s.wishlist?.items?.length ?? 0);
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+    });
+    return () => unsub();
+  }, []);
+
+  const handleAuthClick = async () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      await signOut(auth);
+    } finally {
+      navigate("/login");
+    }
+  };
 
   return (
     <>
@@ -42,6 +70,7 @@ function Header() {
 
             <div className="header-icons">
               <button className="icon-btn">🔍</button>
+
               <Link to="/wishlist" className="icon-btn wishlist-btn-header">
                 🤍
                 <span className="wishlist-count">{wishlistCount}</span>
@@ -50,6 +79,14 @@ function Header() {
                 🛒
                 <span className="cart-count">{totalQuantity}</span>
               </Link>
+
+              <button
+                type="button"
+                className={`auth-btn ${user ? "auth-btn--logout" : ""}`}
+                onClick={handleAuthClick}
+              >
+                {user ? "Log out" : "Login"}
+              </button>
             </div>
           </div>
         </div>
@@ -64,3 +101,4 @@ function Header() {
 }
 
 export default Header;
+

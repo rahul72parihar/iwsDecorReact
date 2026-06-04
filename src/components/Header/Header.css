@@ -270,3 +270,37 @@
     display: none;
   }
 }
+
+/* =========================
+   AUTH BUTTON
+========================= */
+
+.auth-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+
+  font-size: 14px;
+  font-weight: 650;
+  color: #2c2723;
+  white-space: nowrap;
+
+  padding: 10px 14px;
+  border-radius: 999px;
+
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: white;
+
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.auth-btn--logout {
+  border-color: rgba(0, 0, 0, 0.18);
+}
+
