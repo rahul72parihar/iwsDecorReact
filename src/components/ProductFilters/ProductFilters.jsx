@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import './ProductFilters.css';
 
 const CATEGORY_VALUES = [
@@ -28,6 +28,37 @@ export default function ProductFilters({
   minPossibleRating = 0,
   maxPossibleRating = 5,
 }) {
+  const [localPriceMin, setLocalPriceMin] = useState(priceMin);
+  const [localPriceMax, setLocalPriceMax] = useState(priceMax);
+  const [localRatingMin, setLocalRatingMin] = useState(ratingMin);
+
+  useEffect(() => {
+    setLocalPriceMin(priceMin);
+  }, [priceMin]);
+
+  useEffect(() => {
+    setLocalPriceMax(priceMax);
+  }, [priceMax]);
+
+  useEffect(() => {
+    setLocalRatingMin(ratingMin);
+  }, [ratingMin]);
+
+  const normalizePriceRange = (minV, maxV) => {
+    const min = Math.min(minV, maxV);
+    const max = Math.max(minV, maxV);
+
+    const clampedMin = Math.max(
+      minPossiblePrice,
+      Math.min(min, maxPossiblePrice)
+    );
+    const clampedMax = Math.max(
+      minPossiblePrice,
+      Math.min(max, maxPossiblePrice)
+    );
+
+    return { min: clampedMin, max: clampedMax };
+  };
   const priceLabel = useMemo(() => {
     const fmt = (v) => `₹${Math.round(v).toLocaleString('en-IN')}`;
     return `${fmt(priceMin)} - ${fmt(priceMax)}`;
@@ -87,8 +118,18 @@ export default function ProductFilters({
               min={minPossiblePrice}
               max={maxPossiblePrice}
               step={1000}
-              value={priceMin}
-              onChange={(e) => setPriceMin(Number(e.target.value))}
+              value={localPriceMin}
+              onChange={(e) => setLocalPriceMin(Number(e.target.value))}
+              onMouseUp={() => {
+                const next = normalizePriceRange(localPriceMin, localPriceMax);
+                setPriceMin(next.min);
+                setPriceMax(next.max);
+              }}
+              onTouchEnd={() => {
+                const next = normalizePriceRange(localPriceMin, localPriceMax);
+                setPriceMin(next.min);
+                setPriceMax(next.max);
+              }}
             />
             <input
               className="range"
@@ -96,10 +137,21 @@ export default function ProductFilters({
               min={minPossiblePrice}
               max={maxPossiblePrice}
               step={1000}
-              value={priceMax}
-              onChange={(e) => setPriceMax(Number(e.target.value))}
+              value={localPriceMax}
+              onChange={(e) => setLocalPriceMax(Number(e.target.value))}
+              onMouseUp={() => {
+                const next = normalizePriceRange(localPriceMin, localPriceMax);
+                setPriceMin(next.min);
+                setPriceMax(next.max);
+              }}
+              onTouchEnd={() => {
+                const next = normalizePriceRange(localPriceMin, localPriceMax);
+                setPriceMin(next.min);
+                setPriceMax(next.max);
+              }}
             />
           </div>
+
 
           <div className="range-hint">Tip: Adjust both sliders</div>
         </div>
@@ -143,10 +195,16 @@ export default function ProductFilters({
               min={minPossibleRating}
               max={maxPossibleRating}
               step={0.1}
-              value={ratingMin}
-              onChange={(e) => setRatingMin(Number(e.target.value))}
+              value={localRatingMin}
+              onChange={(e) => setLocalRatingMin(Number(e.target.value))}
+              onMouseUp={() => {
+                setRatingMin(localRatingMin);
+              }}
+              onTouchEnd={() => {
+                setRatingMin(localRatingMin);
+              }}
             />
-            <div className="rating-value">{ratingMin.toFixed(1)}+</div>
+            <div className="rating-value">{localRatingMin.toFixed(1)}+</div>
           </div>
         </div>
       </div>
