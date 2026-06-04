@@ -1,11 +1,15 @@
 import { useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
 import { Link } from 'react-router-dom';
 
 import Header from '../../components/Header/Header.jsx';
-import auth from '../../firebase/firebaseAuth';
+import {
+  signInWithEmailPassword,
+  signInWithGooglePopup,
+} from '../../firebase/authService';
 
 import './AuthPages.css';
+import Footer from '../../components/Footer/Footer.jsx';
+
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -25,10 +29,10 @@ export default function Login() {
 
     try {
       setLoading(true);
-      await signInWithEmailAndPassword(auth, email.trim(), password);
-      // App currently doesn't have post-login routing logic.
+      await signInWithEmailPassword(email.trim(), password);
       // Users can navigate manually to /account/profile.
       window.location.href = '/account/profile';
+
     } catch (err) {
       setError(err?.message || 'Login failed.');
     } finally {
@@ -77,6 +81,29 @@ export default function Login() {
                 {loading ? 'Signing in…' : 'Login'}
               </button>
 
+              <div className="auth-divider">or</div>
+
+              <button
+                type="button"
+                disabled={loading}
+                className="auth-secondary-btn"
+                onClick={async () => {
+                  setError('');
+                  setLoading(true);
+                  try {
+                    await signInWithGooglePopup();
+                    window.location.href = '/account/profile';
+                  } catch (err) {
+                    setError(err?.message || 'Google sign-in failed.');
+                  } finally {
+                    setLoading(false);
+                  }
+                }}
+              >
+                {loading ? 'Signing in…' : 'Continue with Google'}
+              </button>
+
+
               <div className="auth-footer">
                 New here? <Link to="/register">Create an account</Link>
               </div>
@@ -84,6 +111,7 @@ export default function Login() {
           </section>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

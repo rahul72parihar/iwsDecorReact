@@ -56,12 +56,15 @@ import AdminSettings from './pages/Admin/Settings.jsx';
 import NotFound from './pages/NotFound/NotFound.jsx';
 
 import Toasts from './components/Toasts/Toasts.jsx';
+import AuthProvider from './auth/AuthProvider.jsx';
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <ScrollToTop />
-      <Routes>
+    <AuthProvider>
+      <BrowserRouter>
+        <ScrollToTop />
+        <Routes>
+
         <Route path="/" element={<Home />} />
 
         <Route path="/products" element={<Products />} />
@@ -117,8 +120,10 @@ export default function App() {
       </Routes>
       <Toasts />
     </BrowserRouter>
+    </AuthProvider>
   );
 }
+
 
 
 

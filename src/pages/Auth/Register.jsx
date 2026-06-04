@@ -1,11 +1,15 @@
 import { useState } from 'react';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { Link } from 'react-router-dom';
 
 import Header from '../../components/Header/Header.jsx';
-import auth from '../../firebase/firebaseAuth';
+import Footer from '../../components/Footer/Footer.jsx';
+import {
+  signUpWithEmailPassword,
+  signInWithGooglePopup,
+} from '../../firebase/authService';
 
 import './AuthPages.css';
+
 
 export default function Register() {
   const [email, setEmail] = useState('');
@@ -31,8 +35,9 @@ export default function Register() {
 
     try {
       setLoading(true);
-      await createUserWithEmailAndPassword(auth, email.trim(), password);
+      await signUpWithEmailPassword(email.trim(), password);
       window.location.href = '/account/profile';
+
     } catch (err) {
       setError(err?.message || 'Registration failed.');
     } finally {
@@ -93,13 +98,37 @@ export default function Register() {
                 {loading ? 'Creating…' : 'Register'}
               </button>
 
+              <div className="auth-divider">or</div>
+
+              <button
+                type="button"
+                disabled={loading}
+                className="auth-secondary-btn"
+                onClick={async () => {
+                  setError('');
+                  setLoading(true);
+                  try {
+                    await signInWithGooglePopup();
+                    window.location.href = '/account/profile';
+                  } catch (err) {
+                    setError(err?.message || 'Google sign-in failed.');
+                  } finally {
+                    setLoading(false);
+                  }
+                }}
+              >
+                {loading ? 'Signing in…' : 'Continue with Google'}
+              </button>
+
               <div className="auth-footer">
                 Already have an account? <Link to="/login">Login</Link>
               </div>
+
             </form>
           </section>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
