@@ -16,6 +16,7 @@ import ProductToolbar from "../../components/ProductToolbar/ProductToolbar";
 import { listProducts } from "../../firebase/productService";
 
 import "./Products.css";
+import CategoryBar from "../../components/Homepage/CategoryBar/CategoryBar";
 
 function clamp(n, min, max) {
   return Math.max(min, Math.min(max, n));
@@ -260,6 +261,7 @@ export default function Products() {
   return (
     <>
       <Header />
+      <CategoryBar/>
 
       <div className="products-page">
         <section className="products-hero">

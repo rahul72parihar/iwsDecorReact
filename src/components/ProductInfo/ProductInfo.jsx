@@ -67,7 +67,7 @@ export default function ProductInfo({
 
           <div className="pi-ratingRow">
             <Stars rating={product?.rating} />
-            <div className="pi-reviewCount">({product?.reviewsCount?.toLocaleString('en-IN')})</div>
+            <div className="pi-reviewCount">{product?.reviewsCount?.toLocaleString('en-IN')}</div>
           </div>
         </div>
 

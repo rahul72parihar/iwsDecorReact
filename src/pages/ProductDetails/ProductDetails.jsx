@@ -94,9 +94,9 @@ export default function ProductDetails() {
       ...r,
       id: `${r.id}-${seed}-${idx}`,
       rating: Math.max(3, Math.min(5, r.rating - ((seed + idx) % 2))),
-      date: new Date(Date.parse(r.date) + (seed % 9) * 86400000)
-        .toISOString()
-        .slice(0, 10),
+      // date: new Date(Date.parse(r.date) + (seed % 9) * 86400000)
+      //   .toISOString()
+      //   .slice(0, 10),
     }));
     return rotated;
   }, [product]);
