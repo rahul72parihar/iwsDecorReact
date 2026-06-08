@@ -1,4 +1,4 @@
-import { uploadToCloudinary } from './cloudinaryUploadService';
+import { uploadImage } from './cloudinaryUploadService.js';
 
 export async function uploadProductImages({
   productId,
@@ -22,14 +22,13 @@ export async function uploadProductImages({
   void deleteOldImages;
 
   const mainFolder = `products/${productId}/main`;
-  const mainImageUrl = await uploadToCloudinary(mainFile, {
-    folder: mainFolder,
-  });
+  const mainImageUrl = await uploadImage(mainFile, { folder: mainFolder });
+
 
   for (const file of additionalFiles || []) {
     if (!file) continue;
     const folder = `products/${productId}/additional`;
-    const url = await uploadToCloudinary(file, { folder });
+    const url = await uploadImage(file, { folder });
     uploadedAdditional.push(url);
   }
 

@@ -1,9 +1,29 @@
-export default function CategoryProducts() {
+import { uploadImage } from "../../firebase/cloudinaryUploadService";
+
+function CategoryProducts() {
+  const handleChange = async (e) => {
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    try {
+      const imageUrl = await uploadImage(file);
+
+      console.log("Uploaded URL:", imageUrl);
+      alert("Upload Success!");
+    } catch (error) {
+      console.error(error);
+      alert("Upload Failed");
+    }
+  };
+
   return (
-    <div style={{ padding: 24 }}>
-      <h1>Category Products</h1>
-      <p>Category products placeholder.</p>
-    </div>
+    <input
+      type="file"
+      accept="image/*"
+      onChange={handleChange}
+    />
   );
 }
 
+export default CategoryProducts;

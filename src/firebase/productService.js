@@ -8,7 +8,7 @@ import {
   deleteDoc,
 } from 'firebase/firestore';
 
-import db from './firestoreDb';
+import db from './firestoreDb.js';
 
 const PRODUCTS_COLLECTION = 'products';
 

@@ -22,9 +22,9 @@ function makeEmptyForm() {
     brand: '',
     price: '',
     oldPrice: '',
-    discountPercent: '',
-    rating: '',
-    reviewsCount: '',
+    // discountPercent: '',
+    // rating: '',
+    // reviewsCount: '',
     inStock: true,
     tags: {
       featured: false,
@@ -122,9 +122,12 @@ export default function AdminProducts() {
       brand: p?.brand ?? '',
       price: p?.price ?? '',
       oldPrice: p?.oldPrice ?? '',
-      discountPercent: p?.discountPercent ?? '',
-      rating: p?.rating ?? '',
-      reviewsCount: p?.reviewsCount ?? '',
+    // discountPercent removed per request
+    // discountPercent: p?.discountPercent ?? '',
+    // rating removed per request
+    // rating: p?.rating ?? '',
+    // reviewsCount removed per request
+    // reviewsCount: p?.reviewsCount ?? '',
       inStock: !!p?.inStock,
       tags: {
         featured: !!p?.tags?.featured,
@@ -136,6 +139,9 @@ export default function AdminProducts() {
       additionalFiles: [],
     });
   };
+
+  const [uploading, setUploading] = useState(false);
+
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -156,9 +162,12 @@ export default function AdminProducts() {
       brand: form.brand.trim() || 'IWS Signature',
       price: toNumberOrNull(form.price),
       oldPrice: toNumberOrNull(form.oldPrice),
-      discountPercent: toNumberOrNull(form.discountPercent),
-      rating: toNumberOrNull(form.rating),
-      reviewsCount: toNumberOrNull(form.reviewsCount) ?? 0,
+      // discountPercent removed per request
+      // discountPercent: toNumberOrNull(form.discountPercent),
+      // rating removed per request
+      // rating: toNumberOrNull(form.rating),
+      // reviewsCount removed per request
+      // reviewsCount: toNumberOrNull(form.reviewsCount) ?? 0,
       inStock: !!form.inStock,
       tags: {
         featured: !!form.tags?.featured,
@@ -172,6 +181,8 @@ export default function AdminProducts() {
     };
 
     try {
+      setUploading(true);
+
       // If mainFile selected, upload & set `image`.
       // If editing and no new mainFile, keep existing image URLs.
       let imagePatch = {};
@@ -205,6 +216,8 @@ export default function AdminProducts() {
       await refresh();
     } catch (e) {
       setError(e?.message || 'Failed to save product');
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -417,15 +430,6 @@ export default function AdminProducts() {
 
             <div className="admin-row">
               <div className="admin-field">
-                <div className="admin-label">Discount %</div>
-                <input
-                  className="admin-input"
-                  value={form.discountPercent}
-                  onChange={(e) => setField('discountPercent', e.target.value)}
-                  placeholder="21"
-                />
-              </div>
-              <div className="admin-field">
                 <div className="admin-label">In Stock</div>
                 <select
                   className="admin-select"
@@ -435,27 +439,6 @@ export default function AdminProducts() {
                   <option value="yes">Yes</option>
                   <option value="no">No</option>
                 </select>
-              </div>
-            </div>
-
-            <div className="admin-row">
-              <div className="admin-field">
-                <div className="admin-label">Rating</div>
-                <input
-                  className="admin-input"
-                  value={form.rating}
-                  onChange={(e) => setField('rating', e.target.value)}
-                  placeholder="4.8"
-                />
-              </div>
-              <div className="admin-field">
-                <div className="admin-label">Reviews Count</div>
-                <input
-                  className="admin-input"
-                  value={form.reviewsCount}
-                  onChange={(e) => setField('reviewsCount', e.target.value)}
-                  placeholder="124"
-                />
               </div>
             </div>
 
@@ -529,8 +512,12 @@ export default function AdminProducts() {
             </div>
 
             <div className="admin-formBtns">
-              <button className="admin-btn primary" type="submit">
-                {selectedProductId ? 'Save changes' : 'Create product'}
+              <button className="admin-btn primary" type="submit" disabled={uploading || fetching}>
+                {uploading
+                  ? 'Uploading images…'
+                  : selectedProductId
+                    ? 'Save changes'
+                    : 'Create product'}
               </button>
               <button
                 className="admin-btn"

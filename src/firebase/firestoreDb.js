@@ -1,6 +1,6 @@
 import { getFirestore } from 'firebase/firestore';
 
-import app from './firebaseApp';
+import app from './firebaseApp.js';
 
 // Create Firestore instance.
 // Assumes you've enabled Firestore in Firebase console.

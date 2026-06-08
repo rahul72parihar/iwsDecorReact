@@ -83,6 +83,7 @@ export default function ProductDetails() {
 
   const productTabs = useMemo(() => {
     if (!product) return [];
+
     const specs = [
       {
         label: "Material",
@@ -96,6 +97,8 @@ export default function ProductDetails() {
       },
     ];
 
+    // Admin requirement: tabs are derived mainly from Name/Description.
+    // We still keep the existing tab keys so UI remains unchanged.
     return [
       {
         key: "description",

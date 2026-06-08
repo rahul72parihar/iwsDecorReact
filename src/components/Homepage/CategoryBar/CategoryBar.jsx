@@ -38,12 +38,16 @@ function ProductCategoryMegaMenu({ category }) {
       {columns.map((col, ci) => (
         <div className="mega-column" key={ci}>
           <h4>
-            <Link to={`/categories/${category.slug}`}>{category.label}</Link>
+            <Link
+              to={`/products?category=${encodeURIComponent(category.label)}`}
+            >
+              {category.label}
+            </Link>
           </h4>
           {col.map((sub) => (
             <Link
               key={sub.slug}
-              to={`/categories/${category.slug}?sub=${sub.slug}`}
+              to={`/products?category=${encodeURIComponent(sub.label)}`}
             >
               {sub.label}
             </Link>
@@ -55,6 +59,7 @@ function ProductCategoryMegaMenu({ category }) {
 }
 
 
+
 function CategoryBar() {
   return (
     <div className="category-bar">
@@ -63,7 +68,7 @@ function CategoryBar() {
         {/* Product-data-driven categories: Lighting, Decor, etc. */}
         {DATA_CATEGORIES.map((cat) => (
           <div className="category-item" key={cat.slug}>
-            <Link to={`/categories/${cat.slug}`} className="category-link">
+            <Link to={`/products?category=${encodeURIComponent(cat.label)}`} className="category-link">
               {cat.label}
             </Link>
             {cat.subcategories.length > 0 && (

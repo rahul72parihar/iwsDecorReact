@@ -3,12 +3,16 @@ import { useEffect, useMemo, useState } from 'react';
 import useAuth from '../../auth/useAuth';
 import { getUserProfile, upsertUserProfile } from '../../firebase/userProfileService';
 
+import Header from '../../components/Header/Header';
+import Footer from '../../components/Footer/Footer';
+
 import './ProfilePage.css';
 
 export default function Profile() {
   const { user, loading: authLoading } = useAuth();
 
   const [profile, setProfile] = useState(null);
+
   const [form, setForm] = useState({
     displayName: '',
     phone: '',
@@ -91,113 +95,116 @@ export default function Profile() {
     }
   };
 
-  if (authLoading || initialLoading) {
-    return (
-      <div className="profile-page">
-        <div className="profile-card">
-          <p className="profile-muted">Loading your profile…</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className="profile-page">
-        <div className="profile-card">
-          <h1>Profile</h1>
-          <p className="profile-muted">Please log in to view your profile.</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="profile-page">
-      <div className="profile-card">
-        <h1>Profile</h1>
-        <p className="profile-muted">Update your details. Saved to Firestore.</p>
+    <>
+      <Header />
 
-        <div style={{ marginTop: 8 }} className="profile-muted">
-          Logged in as: <b>{user?.email || user?.uid}</b>
-        </div>
+      <div className="profile-page">
+        {authLoading || initialLoading ? (
+          <div className="profile-card">
+            <p className="profile-muted">Loading your profile…</p>
+          </div>
+        ) : !user ? (
+          <div className="profile-card">
+            <h1>Profile</h1>
+            <p className="profile-muted">Please log in to view your profile.</p>
+          </div>
+        ) : (
+          <div className="profile-card">
+            <h1>Profile</h1>
+            <p className="profile-muted">Update your details. Saved to Firestore.</p>
 
-        <form onSubmit={onSubmit} style={{ marginTop: 18 }}>
-          <div className="profile-row">
-            <label className="profile-field">
-              <span className="profile-muted">Display Name</span>
-              <input
-                className="profile-input"
-                value={form.displayName}
-                onChange={(e) => setForm((f) => ({ ...f, displayName: e.target.value }))}
-                placeholder="Your name"
-              />
-            </label>
-
-            <label className="profile-field">
-              <span className="profile-muted">Phone</span>
-              <input
-                className="profile-input"
-                value={form.phone}
-                onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-                placeholder="Phone number"
-              />
-            </label>
-
-            <label className="profile-field">
-              <span className="profile-muted">Address Line 1</span>
-              <input
-                className="profile-input"
-                value={form.addressLine1}
-                onChange={(e) => setForm((f) => ({ ...f, addressLine1: e.target.value }))}
-                placeholder="House/Street"
-              />
-            </label>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <label className="profile-field">
-                <span className="profile-muted">City</span>
-                <input
-                  className="profile-input"
-                  value={form.city}
-                  onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
-                  placeholder="City"
-                />
-              </label>
-
-              <label className="profile-field">
-                <span className="profile-muted">State</span>
-                <input
-                  className="profile-input"
-                  value={form.state}
-                  onChange={(e) => setForm((f) => ({ ...f, state: e.target.value }))}
-                  placeholder="State"
-                />
-              </label>
+            <div style={{ marginTop: 8 }} className="profile-muted">
+              Logged in as: <b>{user?.email || user?.uid}</b>
             </div>
 
-            <label className="profile-field">
-              <span className="profile-muted">Postal Code</span>
-              <input
-                className="profile-input"
-                value={form.postalCode}
-                onChange={(e) => setForm((f) => ({ ...f, postalCode: e.target.value }))}
-                placeholder="Postal code"
-              />
-            </label>
-          </div>
+            <form onSubmit={onSubmit} style={{ marginTop: 18 }}>
+              <div className="profile-row">
+                <label className="profile-field">
+                  <span className="profile-muted">Display Name</span>
+                  <input
+                    className="profile-input"
+                    value={form.displayName}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, displayName: e.target.value }))
+                    }
+                    placeholder="Your name"
+                  />
+                </label>
 
-          {error ? <div className="profile-error">{error}</div> : null}
+                <label className="profile-field">
+                  <span className="profile-muted">Phone</span>
+                  <input
+                    className="profile-input"
+                    value={form.phone}
+                    onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+                    placeholder="Phone number"
+                  />
+                </label>
 
-          <div className="profile-actions">
-            <button type="submit" className="profile-primary-btn" disabled={saving}>
-              {saving ? 'Saving…' : 'Save Profile'}
-            </button>
+                <label className="profile-field">
+                  <span className="profile-muted">Address Line 1</span>
+                  <input
+                    className="profile-input"
+                    value={form.addressLine1}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, addressLine1: e.target.value }))
+                    }
+                    placeholder="House/Street"
+                  />
+                </label>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <label className="profile-field">
+                    <span className="profile-muted">City</span>
+                    <input
+                      className="profile-input"
+                      value={form.city}
+                      onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
+                      placeholder="City"
+                    />
+                  </label>
+
+                  <label className="profile-field">
+                    <span className="profile-muted">State</span>
+                    <input
+                      className="profile-input"
+                      value={form.state}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, state: e.target.value }))
+                      }
+                      placeholder="State"
+                    />
+                  </label>
+                </div>
+
+                <label className="profile-field">
+                  <span className="profile-muted">Postal Code</span>
+                  <input
+                    className="profile-input"
+                    value={form.postalCode}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, postalCode: e.target.value }))
+                    }
+                    placeholder="Postal code"
+                  />
+                </label>
+              </div>
+
+              {error ? <div className="profile-error">{error}</div> : null}
+
+              <div className="profile-actions">
+                <button type="submit" className="profile-primary-btn" disabled={saving}>
+                  {saving ? 'Saving…' : 'Save Profile'}
+                </button>
+              </div>
+            </form>
           </div>
-        </form>
+        )}
       </div>
-    </div>
+
+      <Footer />
+    </>
   );
 }
-
 
