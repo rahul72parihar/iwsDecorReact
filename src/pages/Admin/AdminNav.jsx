@@ -38,6 +38,9 @@ export default function AdminNav({ onNavigate }) {
         <NavLink to="/admin/reviews" className={linkClass} onClick={handleClick}>
           Reviews
         </NavLink>
+        <NavLink to="/admin/video-reviews" className={linkClass} onClick={handleClick}>
+          Video Reviews
+        </NavLink>
         <NavLink to="/admin/settings" className={linkClass} onClick={handleClick}>
           Settings
         </NavLink>

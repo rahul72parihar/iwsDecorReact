@@ -1,42 +1,31 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { getVideoReviews } from "../../../services/videoReviewsService";
 import "./VideoReviews.css";
 
 function VideoReviews() {
   const [selectedVideo, setSelectedVideo] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const reviews = useMemo(
-    () => [
-      {
-        id: 1,
-        video:
-          "https://videos.pexels.com/video-files/7583538/7583538-hd_1080_1920_25fps.mp4",
-        title: "Luxury Living Room",
-        city: "Mumbai",
-      },
-      {
-        id: 2,
-        video:
-          "https://videos.pexels.com/video-files/7583538/7583538-hd_1080_1920_25fps.mp4",
-          title: "Modern Brass Setup",
-          city: "Bangalore",
-        },
-        {
-          id: 3,
-          video:
-          "https://videos.pexels.com/video-files/7583538/7583538-hd_1080_1920_25fps.mp4",
-          title: "Premium Dining Decor",
-          city: "Delhi",
-        },
-        {
-          id: 4,
-          video:
-          "https://videos.pexels.com/video-files/7583538/7583538-hd_1080_1920_25fps.mp4",
-          title: "Designer Lighting",
-          city: "Hyderabad",
-        },
-      ],
-    []
-  );
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        setLoading(true);
+        const data = await getVideoReviews();
+        setReviews(data);
+        setError(null);
+      } catch (err) {
+        console.error('Failed to fetch reviews:', err);
+        setError('Failed to load video reviews');
+        setReviews([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReviews();
+  }, []);
 
   const carouselRef = useRef(null);
 
@@ -68,50 +57,70 @@ function VideoReviews() {
           <h2 className="section-title">Customer Video Reviews</h2>
         </div>
 
-        <div className="video-carousel-wrapper">
-          <button
-            type="button"
-            className="carousel-arrow carousel-arrow-left"
-            aria-label="Scroll reviews left"
-            onClick={() => scrollByCard(-1)}
-          >
-            ‹
-          </button>
-
-          <div ref={carouselRef} className="video-carousel">
-            {reviews.map((review) => (
-              <div
-                className="video-card"
-                key={review.id}
-                onClick={() => setSelectedVideo(review)}
-              >
-                <video
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  preload="metadata"
-                >
-                  <source src={review.video} type="video/mp4" />
-                </video>
-
-                <div className="video-overlay">
-                  <h4>{review.title}</h4>
-                  <p>{review.city}</p>
-                </div>
-              </div>
-            ))}
+        {loading && (
+          <div style={{ textAlign: 'center', padding: '40px' }}>
+            <p>Loading video reviews...</p>
           </div>
+        )}
 
-          <button
-            type="button"
-            className="carousel-arrow carousel-arrow-right"
-            aria-label="Scroll reviews right"
-            onClick={() => scrollByCard(1)}
-          >
-            ›
-          </button>
-        </div>
+        {error && (
+          <div style={{ textAlign: 'center', padding: '40px', color: '#d32f2f' }}>
+            <p>{error}</p>
+          </div>
+        )}
+
+        {!loading && !error && reviews.length === 0 && (
+          <div style={{ textAlign: 'center', padding: '40px' }}>
+            <p>No video reviews available yet.</p>
+          </div>
+        )}
+
+        {!loading && reviews.length > 0 && (
+          <div className="video-carousel-wrapper">
+            <button
+              type="button"
+              className="carousel-arrow carousel-arrow-left"
+              aria-label="Scroll reviews left"
+              onClick={() => scrollByCard(-1)}
+            >
+              ‹
+            </button>
+
+            <div ref={carouselRef} className="video-carousel">
+              {reviews.map((review) => (
+                <div
+                  className="video-card"
+                  key={review.id}
+                  onClick={() => setSelectedVideo(review)}
+                >
+                  <video
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="metadata"
+                  >
+                    <source src={review.video} type="video/mp4" />
+                  </video>
+
+                  <div className="video-overlay">
+                    <h4>{review.title}</h4>
+                    <p>{review.city}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              className="carousel-arrow carousel-arrow-right"
+              aria-label="Scroll reviews right"
+              onClick={() => scrollByCard(1)}
+            >
+              ›
+            </button>
+          </div>
+        )}
       </section>
 
       {selectedVideo && (

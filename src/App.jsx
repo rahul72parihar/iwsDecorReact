@@ -54,6 +54,7 @@ import AdminCategories from './pages/Admin/Categories.jsx';
 import AdminOrders from './pages/Admin/Orders.jsx';
 import AdminCustomers from './pages/Admin/Customers.jsx';
 import AdminReviews from './pages/Admin/Reviews.jsx';
+import AdminVideoReviews from './pages/Admin/VideoReviews.jsx';
 import AdminSettings from './pages/Admin/Settings.jsx';
 
 import NotFound from './pages/NotFound/NotFound.jsx';
@@ -125,6 +126,7 @@ export default function App() {
         <Route path="/admin/orders" element={<AdminOrders />} />
         <Route path="/admin/customers" element={<AdminCustomers />} />
         <Route path="/admin/reviews" element={<AdminReviews />} />
+        <Route path="/admin/video-reviews" element={<AdminVideoReviews />} />
         <Route path="/admin/settings" element={<AdminSettings />} />
 
         <Route path="*" element={<NotFound />} />
