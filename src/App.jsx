@@ -58,9 +58,11 @@ import AdminVideoReviews from './pages/Admin/VideoReviews.jsx';
 import AdminSettings from './pages/Admin/Settings.jsx';
 
 import NotFound from './pages/NotFound/NotFound.jsx';
+import Unauthorized from './pages/Unauthorized/Unauthorized.jsx';
 
 import Toasts from './components/Toasts/Toasts.jsx';
 import AuthProvider from './auth/AuthProvider.jsx';
+import ProtectedAdminRoute from './auth/ProtectedAdminRoute.jsx';
 
 import CartWishlistSyncMount from './features/cart/cartWishlistSyncMount.jsx';
 
@@ -120,14 +122,15 @@ export default function App() {
         <Route path="/shipping-policy" element={<ShippingPolicy />} />
         <Route path="/return-policy" element={<ReturnPolicy />} />
 
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/products" element={<AdminProducts />} />
-        <Route path="/admin/categories" element={<AdminCategories />} />
-        <Route path="/admin/orders" element={<AdminOrders />} />
-        <Route path="/admin/customers" element={<AdminCustomers />} />
-        <Route path="/admin/reviews" element={<AdminReviews />} />
-        <Route path="/admin/video-reviews" element={<AdminVideoReviews />} />
-        <Route path="/admin/settings" element={<AdminSettings />} />
+        <Route path="/unauthorized" element={<Unauthorized />} />
+
+        <Route path="/admin" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />
+        <Route path="/admin/products" element={<ProtectedAdminRoute><AdminProducts /></ProtectedAdminRoute>} />
+        <Route path="/admin/categories" element={<ProtectedAdminRoute><AdminCategories /></ProtectedAdminRoute>} />
+        <Route path="/admin/orders" element={<ProtectedAdminRoute><AdminOrders /></ProtectedAdminRoute>} />
+        <Route path="/admin/customers" element={<ProtectedAdminRoute><AdminCustomers /></ProtectedAdminRoute>} />
+        <Route path="/admin/reviews" element={<ProtectedAdminRoute><AdminReviews /></ProtectedAdminRoute>} />
+        <Route path="/admin/settings" element={<ProtectedAdminRoute><AdminSettings /></ProtectedAdminRoute>} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>
