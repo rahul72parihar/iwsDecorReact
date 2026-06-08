@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import AdminNav from './AdminNav';
 import { getVideoReviews, addVideoReview, updateVideoReview, deleteVideoReview } from '../../services/videoReviewsService';
+import { uploadVideo } from '../../firebase/cloudinaryUploadService';
 import './VideoReviews.css';
 
 export default function AdminVideoReviews() {
@@ -10,6 +11,7 @@ export default function AdminVideoReviews() {
   const [success, setSuccess] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     city: '',
@@ -40,6 +42,28 @@ export default function AdminVideoReviews() {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleVideoFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploading(true);
+      setError(null);
+      const videoUrl = await uploadVideo(file, { folder: 'videoReviews' });
+      setFormData((prev) => ({
+        ...prev,
+        video: videoUrl,
+      }));
+      setSuccess('Video uploaded successfully');
+      setTimeout(() => setSuccess(null), 2000);
+    } catch (err) {
+      console.error('Error uploading video:', err);
+      setError(err.message || 'Failed to upload video');
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -174,23 +198,37 @@ export default function AdminVideoReviews() {
               </div>
 
               <div className="formGroup">
-                <label htmlFor="video">Video URL</label>
-                <input
-                  type="url"
-                  id="video"
-                  name="video"
-                  value={formData.video}
-                  onChange={handleInputChange}
-                  placeholder="https://example.com/video.mp4"
-                  required
-                />
+                <label htmlFor="video">Video File or URL</label>
+                <div className="videoUploadSection">
+                  <input
+                    type="file"
+                    id="videoFile"
+                    accept="video/*"
+                    onChange={handleVideoFileChange}
+                    disabled={uploading}
+                    style={{ marginBottom: '10px' }}
+                  />
+                  <small style={{ display: 'block', color: '#666', marginBottom: '10px' }}>
+                    {uploading ? 'Uploading video...' : 'Upload a video file (or paste URL below)'}
+                  </small>
+                  <input
+                    type="url"
+                    id="video"
+                    name="video"
+                    value={formData.video}
+                    onChange={handleInputChange}
+                    placeholder="https://example.com/video.mp4"
+                    required
+                    disabled={uploading}
+                  />
+                </div>
               </div>
 
               <div className="formActions">
-                <button type="submit" className="adminButton adminButton-primary">
-                  {editingId ? 'Update' : 'Add'} Review
+                <button type="submit" className="adminButton adminButton-primary" disabled={uploading}>
+                  {uploading ? 'Uploading...' : editingId ? 'Update' : 'Add'} Review
                 </button>
-                <button type="button" className="adminButton adminButton-secondary" onClick={handleCancel}>
+                <button type="button" className="adminButton adminButton-secondary" onClick={handleCancel} disabled={uploading}>
                   Cancel
                 </button>
               </div>
