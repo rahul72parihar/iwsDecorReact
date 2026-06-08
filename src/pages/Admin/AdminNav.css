@@ -1,13 +1,13 @@
 .adminNav{width:240px;min-height:calc(100vh - 0px);border-right:1px solid rgba(0,0,0,.08);background:#fff;display:flex;flex-direction:column;padding:16px 14px}
 .adminNav-brand{display:flex;align-items:center;gap:12px;padding:6px 6px 12px;margin-bottom:8px;border-bottom:1px solid rgba(0,0,0,.08)}
-.adminNav-logo{width:40px;height:40px;border-radius:14px;border:1px solid rgba(0,0,0,.1);background:linear-gradient(135deg,#111 0%,#444 100%);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;letter-spacing:.02em}
-.adminNav-title{font-weight:900;font-size:16px;line-height:1}
-.adminNav-sub{color:#666;font-weight:800;font-size:12px;margin-top:4px}
+.adminNav-logo{width:40px;height:40px;border-radius:14px;border:1px solid rgba(0,0,0,.08);background:linear-gradient(135deg,rgba(17,17,17,.14) 0%,rgba(68,68,68,.10) 100%);color:#111;display:flex;align-items:center;justify-content:center;font-weight:700;letter-spacing:.02em}
+.adminNav-title{font-weight:700;font-size:16px;line-height:1}
+.adminNav-sub{color:#666;font-weight:650;font-size:12px;margin-top:4px}
 .adminNav-links{display:flex;flex-direction:column;gap:6px;padding:4px}
-.adminNav-link{display:flex;align-items:center;justify-content:space-between;text-decoration:none;color:#222;font-weight:900;padding:10px 12px;border-radius:12px;border:1px solid transparent;transition:all .15s ease}
+.adminNav-link{display:flex;align-items:center;justify-content:space-between;text-decoration:none;color:#222;font-weight:650;padding:10px 12px;border-radius:12px;border:1px solid transparent;transition:all .15s ease}
 .adminNav-link:hover{border-color:rgba(0,0,0,.12);background:rgba(0,0,0,.03)}
-.adminNav-link.active{background:#111;color:#fff;border-color:#111}
-.adminNav-footer{margin-top:auto;padding:12px 6px 4px;color:#666;font-weight:800;font-size:12px}
+.adminNav-link.active{background:rgba(17,17,17,.92);color:#fff;border-color:rgba(17,17,17,.92);font-weight:700}
+.adminNav-footer{margin-top:auto;padding:12px 6px 4px;color:#666;font-weight:650;font-size:12px}
 
 @media (max-width: 980px){.adminNav{width:100%;min-height:auto;flex-direction:row;gap:10px;overflow:auto;border-right:none;border-bottom:1px solid rgba(0,0,0,.08)}.adminNav-links{flex-direction:row;gap:8px}.adminNav-footer{display:none}}
 

@@ -10,20 +10,25 @@ export async function uploadProductImages({
   deleteOldImages = false,
 }) {
   if (!productId) throw new Error('Missing productId');
-  if (!mainFile) throw new Error('Main photo is required');
 
+  const hasNewMain = !!mainFile;
   const uploadedAdditional = [];
 
   // NOTE: Firebase Storage deletion logic is intentionally removed.
   // Cloudinary delete requires secure credentials or a signed request.
   // If you later want deletion, implement server-side or signed Cloudinary calls.
-  void existingMainUrl;
   void existingAdditionalUrls;
   void deleteOldImages;
 
-  const mainFolder = `products/${productId}/main`;
-  const mainImageUrl = await uploadImage(mainFile, { folder: mainFolder });
+  // If editing and mainFile not provided, keep the existing main image URL.
+  const mainImageUrl = hasNewMain
+    ? await uploadImage(mainFile, { folder: `products/${productId}/main` })
+    : existingMainUrl;
 
+  if (!mainImageUrl) {
+    // Create flow (no existing image) without mainFile.
+    throw new Error('Main photo is required (select an image for “Main Image”).');
+  }
 
   for (const file of additionalFiles || []) {
     if (!file) continue;
@@ -37,5 +42,8 @@ export async function uploadProductImages({
     additionalImageUrls: uploadedAdditional,
   };
 }
+
+
+
 
 

@@ -30,6 +30,7 @@ import OrderDetails from './pages/User/OrderDetails.jsx';
 import Addresses from './pages/User/Addresses.jsx';
 import UserWishlist from './pages/User/Wishlist.jsx';
 
+
 import SearchResults from './pages/Search/SearchResults.jsx';
 
 import BrassCollection from './pages/Collections/BrassCollection.jsx';

@@ -1,16 +1,13 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { onAuthStateChanged, signOut } from "firebase/auth";
-
+import { onAuthStateChanged } from "firebase/auth";
 import auth from "../../firebase/firebaseAuth";
 
 import "./Header.css";
 import HeaderSidebar from "../HeaderSidebar/HeaderSidebar";
 
 function Header() {
-  const navigate = useNavigate();
-
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState(null);
 
@@ -24,18 +21,7 @@ function Header() {
     return () => unsub();
   }, []);
 
-  const handleAuthClick = async () => {
-    if (!user) {
-      navigate("/login");
-      return;
-    }
 
-    try {
-      await signOut(auth);
-    } finally {
-      navigate("/login");
-    }
-  };
 
   return (
     <>
@@ -80,13 +66,16 @@ function Header() {
                 <span className="cart-count">{totalQuantity}</span>
               </Link>
 
-              <button
-                type="button"
-                className={`auth-btn ${user ? "auth-btn--logout" : ""}`}
-                onClick={handleAuthClick}
+              <Link
+                to={user ? "/account/profile" : "/login"}
+                className="icon-btn"
+                style={{ textDecoration: 'none' }}
+                aria-label="Profile"
               >
-                {user ? "Log out" : "Login"}
-              </button>
+                👤
+              </Link>
+
+
             </div>
           </div>
         </div>
