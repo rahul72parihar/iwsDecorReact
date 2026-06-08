@@ -21,6 +21,36 @@
   margin-bottom: 16px;
 }
 
+.filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 12px;
+}
+
+.clear-filters-btn {
+  padding: 6px 12px;
+  border: 1px solid rgba(201, 168, 76, 0.6);
+  background: transparent;
+  color: #c9a84c;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.clear-filters-btn:hover {
+  background: rgba(201, 168, 76, 0.08);
+  border-color: #c9a84c;
+}
+
+.clear-filters-btn:active {
+  transform: scale(0.98);
+}
+
 .filter-block {
   margin-bottom: 20px;
 }
@@ -137,6 +167,10 @@
     width: 100%;
   }
 
+  .filters-header {
+    width: 100%;
+    margin-bottom: 0;
+  }
 
   .filter-block {
     margin-bottom: 0;

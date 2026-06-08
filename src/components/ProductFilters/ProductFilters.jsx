@@ -65,17 +65,47 @@ export default function ProductFilters({
   }, [priceMin, priceMax]);
 
   const toggleCategory = (cat) => {
-    if (selectedCategories.includes(cat)) {
-      setSelectedCategories(selectedCategories.filter((c) => c !== cat));
-    } else {
-      setSelectedCategories([...selectedCategories, cat]);
-    }
+    setSelectedCategories((prevCategories) => {
+      if (prevCategories.includes(cat)) {
+        return prevCategories.filter((c) => c !== cat);
+      }
+      return [...prevCategories, cat];
+    });
   };
+
+  const clearAllFilters = () => {
+    setSearch('');
+    setSelectedCategories([]);
+    setPriceMin(minPossiblePrice);
+    setPriceMax(maxPossiblePrice);
+    setAvailability('all');
+    setRatingMin(0);
+  };
+
+  const hasActiveFilters = 
+    search.trim() !== '' ||
+    selectedCategories.length > 0 ||
+    priceMin !== minPossiblePrice ||
+    priceMax !== maxPossiblePrice ||
+    availability !== 'all' ||
+    ratingMin > 0;
 
   return (
     <aside className="filters" aria-label="Product filters">
       <div className="filters-card">
-        <div className="filters-title">Filters</div>
+        <div className="filters-header">
+          <div className="filters-title">Filters</div>
+          {hasActiveFilters && (
+            <button
+              className="clear-filters-btn"
+              onClick={clearAllFilters}
+              type="button"
+              aria-label="Clear all filters"
+            >
+              Clear
+            </button>
+          )}
+        </div>
 
         <div className="filter-block">
           <label className="filter-label" htmlFor="product-search">
@@ -186,7 +216,7 @@ export default function ProductFilters({
           </div>
         </div>
 
-        <div className="filter-block">
+        {/* <div className="filter-block">
           <div className="filter-label">Rating</div>
           <div className="rating-row">
             <input
@@ -206,7 +236,7 @@ export default function ProductFilters({
             />
             <div className="rating-value">{localRatingMin.toFixed(1)}+</div>
           </div>
-        </div>
+        </div> */}
       </div>
     </aside>
   );
