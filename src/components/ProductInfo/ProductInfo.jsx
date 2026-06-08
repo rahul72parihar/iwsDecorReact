@@ -66,8 +66,8 @@ export default function ProductInfo({
           <div className="pi-brand">{product.brand ?? 'IWS Signature'}</div>
 
           <div className="pi-ratingRow">
-            <Stars rating={product.rating} />
-            <div className="pi-reviewCount">({product.reviewsCount.toLocaleString('en-IN')})</div>
+            <Stars rating={product?.rating} />
+            <div className="pi-reviewCount">({product?.reviewsCount?.toLocaleString('en-IN')})</div>
           </div>
         </div>
 

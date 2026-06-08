@@ -55,20 +55,20 @@ export default function ProductDetails() {
   const { productId } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     let alive = true;
     const run = async () => {
       setLoading(true);
-      setError('');
+      setError("");
       try {
         const p = await getProduct(productId);
         if (!alive) return;
         setProduct(p);
       } catch (e) {
         if (!alive) return;
-        setError(e?.message || 'Failed to load product');
+        setError(e?.message || "Failed to load product");
         setProduct(null);
       } finally {
         if (!alive) return;
@@ -80,7 +80,6 @@ export default function ProductDetails() {
       alive = false;
     };
   }, [productId]);
-
 
   const dispatch = useDispatch();
 
@@ -158,7 +157,10 @@ export default function ProductDetails() {
     return (
       <>
         <Header />
-        <div className="product-details-page" style={{ padding: 24, textAlign: 'center', fontWeight: 800 }}>
+        <div
+          className="product-details-page"
+          style={{ padding: 24, textAlign: "center", fontWeight: 800 }}
+        >
           Loading product…
         </div>
         <Footer />
@@ -170,7 +172,15 @@ export default function ProductDetails() {
     return (
       <>
         <Header />
-        <div className="product-details-page" style={{ padding: 24, textAlign: 'center', fontWeight: 800, color: '#b00020' }}>
+        <div
+          className="product-details-page"
+          style={{
+            padding: 24,
+            textAlign: "center",
+            fontWeight: 800,
+            color: "#b00020",
+          }}
+        >
           {error}
         </div>
         <Footer />
@@ -240,7 +250,7 @@ export default function ProductDetails() {
                       type: "success",
                       title: "Added to cart",
                       message: product.name,
-                      link: '/cart',
+                      link: "/cart",
                     }),
                   );
                 }}
@@ -258,17 +268,19 @@ export default function ProductDetails() {
           />
         </section>
 
-        <section className="product-details-reviews">
-          <div className="section-head">
-            <h2 className="section-title">Customer Reviews</h2>
-            <div className="section-sub">
-              <span className="gold">{product.rating.toFixed(1)}</span> rating •{" "}
-              {product.reviewsCount.toLocaleString("en-IN")} reviews
+        {product?.reviewsCount > 0 && (
+          <section className="product-details-reviews">
+            <div className="section-head">
+              <h2 className="section-title">Customer Reviews</h2>
+              <div className="section-sub">
+                <span className="gold">{product?.rating?.toFixed(1)}</span>{" "}
+                rating • {product?.reviewsCount?.toLocaleString("en-IN")} reviews
+              </div>
             </div>
-          </div>
 
-          <Reviews reviews={reviews} formatDate={formatDate} />
-        </section>
+            <Reviews reviews={reviews} formatDate={formatDate} />
+          </section>
+        )}
 
         <section className="product-details-related">
           <div className="section-head">
