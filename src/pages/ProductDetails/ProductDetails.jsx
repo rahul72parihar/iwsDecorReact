@@ -5,7 +5,9 @@ import { addToCart } from "../../features/cart/cartSlice";
 import { pushAutoToast } from "../../store/toastSlice";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
-import { products as allProducts } from "../../data/products";
+import { useEffect } from "react";
+import { getProduct } from "../../firebase/productService";
+
 import ProductGallery from "../../components/ProductGallery/ProductGallery";
 import ProductInfo from "../../components/ProductInfo/ProductInfo";
 import ProductDescription from "../../components/ProductDescription/ProductDescription";
@@ -51,15 +53,34 @@ function formatDate(iso) {
 
 export default function ProductDetails() {
   const { productId } = useParams();
-  const id = useMemo(() => {
-    const n = Number(productId);
-    return Number.isFinite(n) ? n : null;
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let alive = true;
+    const run = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const p = await getProduct(productId);
+        if (!alive) return;
+        setProduct(p);
+      } catch (e) {
+        if (!alive) return;
+        setError(e?.message || 'Failed to load product');
+        setProduct(null);
+      } finally {
+        if (!alive) return;
+        setLoading(false);
+      }
+    };
+    run();
+    return () => {
+      alive = false;
+    };
   }, [productId]);
 
-  const product = useMemo(
-    () => allProducts.find((p) => p.id === id) ?? null,
-    [id],
-  );
 
   const dispatch = useDispatch();
 
@@ -133,10 +154,35 @@ export default function ProductDetails() {
     ];
   }, [product]);
 
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <div className="product-details-page" style={{ padding: 24, textAlign: 'center', fontWeight: 800 }}>
+          Loading product…
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <>
+        <Header />
+        <div className="product-details-page" style={{ padding: 24, textAlign: 'center', fontWeight: 800, color: '#b00020' }}>
+          {error}
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
   if (!product) {
     return (
       <>
         <Header />
+
         <div className="product-details-page">
           <section className="product-details-hero">
             <div className="product-details-hero-inner">

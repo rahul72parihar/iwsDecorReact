@@ -8,6 +8,8 @@ import ProductDetails from './pages/ProductDetails/ProductDetails.jsx';
 
 
 import CategoryProducts from './pages/Categories/CategoryProducts.jsx';
+import SubcategoryProducts from './pages/Subcategories/SubcategoryProducts.jsx';
+
 
 import Cart from './pages/Cart/Cart.jsx';
 import Wishlist from './pages/Wishlist/Wishlist.jsx';
@@ -76,6 +78,9 @@ export default function App() {
         <Route path="/products/:productId" element={<ProductDetails />} />
 
         <Route path="/categories/:categoryId" element={<CategoryProducts />} />
+        <Route path="/subcategories" element={<SubcategoryProducts />} />
+        <Route path="/subcategories/:subcategoryId" element={<SubcategoryProducts />} />
+
 
         <Route path="/cart" element={<Cart />} />
         <Route path="/wishlist" element={<Wishlist />} />

@@ -1,0 +1,240 @@
+/* Reuse the Products page look closely */
+
+.subcat-hero {
+  min-height: 56vh;
+  display: flex;
+  align-items: center;
+  padding: 40px 6% 60px;
+  position: relative;
+  overflow: hidden;
+
+  background-image:
+    linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.75) 0%,
+      rgba(0, 0, 0, 0.55) 35%,
+      rgba(0, 0, 0, 0.18) 65%,
+      rgba(0, 0, 0, 0.05) 100%
+    ),
+    url('https://the-next-decor.com/cdn/shop/files/4_d0d5eda9-3a5d-4005-823e-24f91a757665.jpg?v=1699338202');
+
+  background-size: cover;
+  background-position: center;
+}
+
+.subcat-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 20% 20%,
+    rgba(201, 168, 76, 0.22),
+    rgba(0, 0, 0, 0) 45%
+  );
+  pointer-events: none;
+}
+
+.subcat-hero-inner {
+  max-width: 760px;
+  position: relative;
+  z-index: 1;
+}
+
+.subcat-hero-tag {
+  color: #efd08a;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.subcat-hero-title {
+  font-size: 82px;
+  line-height: 0.95;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 500;
+  color: white;
+  margin-bottom: 18px;
+}
+
+.subcat-hero-sub {
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.82);
+  max-width: 620px;
+}
+
+.subcat-layout {
+  padding: 50px 6% 0;
+}
+
+.subcat-layout-grid {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 34px;
+  align-items: start;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px;
+}
+
+.pagination {
+  margin-top: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.page-btn {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.65);
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.page-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: rgba(201, 168, 76, 0.6);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.08);
+}
+
+.page-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.page-numbers {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.page-number {
+  min-width: 46px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.65);
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.page-number:hover {
+  border-color: rgba(201, 168, 76, 0.6);
+  transform: translateY(-1px);
+}
+
+.page-number.active {
+  background: #1d1815;
+  color: white;
+  border-color: #1d1815;
+}
+
+@media (max-width: 1200px) {
+  .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .subcat-layout-grid {
+    grid-template-columns: 320px 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .subcat-layout-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filters {
+    position: relative;
+    top: auto;
+  }
+
+  .subcat-hero {
+    padding: 40px 22px 60px;
+  }
+
+  .subcat-layout {
+    padding: 40px 22px 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .subcat-hero-title {
+    font-size: 56px;
+  }
+
+  .subcat-hero-sub {
+    font-size: 16px;
+  }
+
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mobile-filter-btn {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-filter-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 14px 18px;
+
+    border: none;
+    border-radius: 999px;
+
+    background: #c9a84c;
+    color: #111;
+
+    font-weight: 700;
+    font-size: 15px;
+
+    cursor: pointer;
+  }
+
+  .filters-wrapper {
+    display: none;
+    margin-bottom: 20px;
+  }
+
+  .filters-wrapper.filters-open {
+    display: block;
+  }
+}
+
+@media (min-width: 901px) {
+  .filters-wrapper {
+    position: sticky;
+    top: 100px;
+    align-self: start;
+
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+  }
+
+  .filters-wrapper::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .filters-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(201, 168, 76, 0.6);
+    border-radius: 999px;
+  }
+}
+

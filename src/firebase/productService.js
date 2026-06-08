@@ -19,6 +19,7 @@ export function productsCollection() {
 export async function listProducts() {
   const q = query(productsCollection());
   const snap = await getDocs(q);
+  console.log('listProducts snap', snap.docs.map((d) => ({ id: d.id, ...d.data() })));
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 }
 

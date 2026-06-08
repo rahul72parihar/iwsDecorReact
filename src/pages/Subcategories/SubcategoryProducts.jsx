@@ -1,21 +1,21 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from 'react';
 
-import { useDispatch } from "react-redux";
+import { useDispatch } from 'react-redux';
 
-import { addToCart } from "../../features/cart/cartSlice";
-import { toggleWishlist } from "../../features/wishlist/wishlistSlice";
-import { pushAutoToast } from "../../store/toastSlice";
+import { addToCart } from '../../features/cart/cartSlice';
+import { toggleWishlist } from '../../features/wishlist/wishlistSlice';
+import { pushAutoToast } from '../../store/toastSlice';
 
-import Header from "../../components/Header/Header";
-import Footer from "../../components/Footer/Footer";
+import Header from '../../components/Header/Header';
+import Footer from '../../components/Footer/Footer';
 
-import ProductCard from "../../components/ProductCard/ProductCard";
-import ProductFilters from "../../components/ProductFilters/ProductFilters";
-import ProductToolbar from "../../components/ProductToolbar/ProductToolbar";
+import ProductCard from '../../components/ProductCard/ProductCard';
+import ProductFilters from '../../components/ProductFilters/ProductFilters';
+import ProductToolbar from '../../components/ProductToolbar/ProductToolbar';
 
-import { listProducts } from "../../firebase/productService";
+import { listProducts } from '../../firebase/productService';
 
-import "./Products.css";
+import './SubcategoryProducts.css';
 
 function clamp(n, min, max) {
   return Math.max(min, Math.min(max, n));
@@ -25,7 +25,6 @@ const priceBounds = (items) => {
   const prices = items.map((p) => p.price);
   const min = Math.min(...prices);
   const max = Math.max(...prices);
-  // Round to nice slider steps
   const step = 1000;
   return {
     min: Math.floor(min / step) * step,
@@ -33,24 +32,25 @@ const priceBounds = (items) => {
   };
 };
 
-export default function Products() {
+export default function SubcategoryProducts() {
+  const dispatch = useDispatch();
+
   const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   useEffect(() => {
     let alive = true;
     const run = async () => {
       setLoading(true);
-      setError("");
+      setError('');
       try {
         const list = await listProducts();
         if (!alive) return;
         setAllProducts(list);
-        console.log("Products loaded", list);
       } catch (e) {
         if (!alive) return;
-        setError(e?.message || "Failed to load products");
+        setError(e?.message || 'Failed to load products');
       } finally {
         if (!alive) return;
         setLoading(false);
@@ -62,42 +62,47 @@ export default function Products() {
     };
   }, []);
 
+  const params = new URLSearchParams(window.location.search);
+  const subcategory = params.get('subcategory');
+
+
+  // Prefer subcategory from URL param; if not present, show empty results gracefully.
+  const normalizedSubcategory = (subcategory || '').trim();
+
+  const filteredBySubcategory = useMemo(() => {
+    if (!normalizedSubcategory) return [];
+    return allProducts.filter(
+      (p) => p.subcategory === normalizedSubcategory
+    );
+  }, [allProducts, normalizedSubcategory]);
+
   const bounds = useMemo(() => {
-    const items = allProducts.length ? allProducts : [{ price: 0 }];
+    const items = filteredBySubcategory.length
+      ? filteredBySubcategory
+      : [{ price: 0 }];
     return priceBounds(items);
-  }, [allProducts]);
+  }, [filteredBySubcategory]);
 
-  useEffect(() => {
-    if (allProducts.length > 0) {
-      setPriceMin(bounds.min);
-      setPriceMax(bounds.max);
-    }
-  }, [bounds, allProducts.length]);
-
-  const [search, setSearch] = useState("");
-  const [selectedCategories, setSelectedCategories] = useState(() => {
-    // If homepage category card clicked: /products?category=...
-    // We store it in the same state shape as ProductFilters expects.
-    const params = new URLSearchParams(window.location.search);
-    const c = params.get("category");
-    return c ? [c] : [];
-  });
+  const [search, setSearch] = useState('');
+  const [selectedCategories, setSelectedCategories] = useState([]);
 
   const [priceMin, setPriceMin] = useState(bounds.min);
   const [priceMax, setPriceMax] = useState(bounds.max);
 
-  const [availability, setAvailability] = useState("all"); // all | in | out
+  const [availability, setAvailability] = useState('all');
   const [ratingMin, setRatingMin] = useState(0);
-
-  const [sort, setSort] = useState("featured");
+  const [sort, setSort] = useState('featured');
 
   const [showFilters, setShowFilters] = useState(false);
 
-  // Category card selection from Homepage: /products?category=...
-  // We initialize `selectedCategories` from that querystring above.
-
   const [page, setPage] = useState(1);
   const pageSize = 12;
+
+  useEffect(() => {
+    setPriceMin(bounds.min);
+    setPriceMax(bounds.max);
+    setPage(1);
+  }, [bounds.min, bounds.max]);
 
   const normalizedPrice = useMemo(() => {
     const minV = Math.min(priceMin, priceMax);
@@ -108,7 +113,7 @@ export default function Products() {
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
 
-    return allProducts.filter((p) => {
+    return filteredBySubcategory.filter((p) => {
       const matchesSearch =
         !q ||
         p.name.toLowerCase().includes(q) ||
@@ -122,19 +127,27 @@ export default function Products() {
         p.price >= normalizedPrice.min && p.price <= normalizedPrice.max;
 
       const matchesAvailability =
-        availability === "all"
+        availability === 'all'
           ? true
-          : availability === "in"
+          : availability === 'in'
             ? p.inStock
             : !p.inStock;
 
-      const matchesRating = p.rating >= ratingMin;
-
       return (
-        matchesSearch && matchesCategory && matchesPrice && matchesAvailability
+        matchesSearch &&
+        matchesCategory &&
+        matchesPrice &&
+        matchesAvailability 
       );
     });
-  }, [search, selectedCategories, normalizedPrice, availability, ratingMin]);
+  }, [
+    filteredBySubcategory,
+    search,
+    selectedCategories,
+    normalizedPrice,
+    availability,
+    ratingMin,
+  ]);
 
   const sorted = useMemo(() => {
     const arr = [...filtered];
@@ -145,17 +158,15 @@ export default function Products() {
 
     arr.sort((a, b) => {
       switch (sort) {
-        case "newest":
+        case 'newest':
           return scoreNewest(b) - scoreNewest(a) || b.id - a.id;
-        case "priceLow":
+        case 'priceLow':
           return a.price - b.price;
-        case "priceHigh":
+        case 'priceHigh':
           return b.price - a.price;
-        case "bestSelling":
-          return (
-            scoreBestSelling(b) - scoreBestSelling(a) || b.rating - a.rating
-          );
-        case "featured":
+        case 'bestSelling':
+          return scoreBestSelling(b) - scoreBestSelling(a) || b.rating - a.rating;
+        case 'featured':
         default:
           return scoreFeatured(b) - scoreFeatured(a) || b.rating - a.rating;
       }
@@ -165,17 +176,24 @@ export default function Products() {
   }, [filtered, sort]);
 
   const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
-
-  // keep page in bounds when filters change
   const safePage = clamp(page, 1, totalPages);
+
   const pageItems = useMemo(() => {
     const start = (safePage - 1) * pageSize;
     return sorted.slice(start, start + pageSize);
   }, [sorted, safePage]);
 
-  const dispatch = useDispatch();
+  const pageNumbers = useMemo(() => {
+    const windowSize = 5;
+    const half = Math.floor(windowSize / 2);
+    let start = Math.max(1, safePage - half);
+    let end = Math.min(totalPages, start + windowSize - 1);
+    start = Math.max(1, end - windowSize + 1);
 
-  // addToCart(product) from Redux
+    const nums = [];
+    for (let i = start; i <= end; i += 1) nums.push(i);
+    return nums;
+  }, [safePage, totalPages]);
 
   const onAddToCart = (product) => {
     if (!product) return;
@@ -191,10 +209,10 @@ export default function Products() {
 
     dispatch(
       pushAutoToast({
-        type: "success",
-        title: "Added to cart",
+        type: 'success',
+        title: 'Added to cart',
         message: product.name,
-        link: "/cart",
+        link: '/cart',
       }),
     );
   };
@@ -205,32 +223,19 @@ export default function Products() {
 
     dispatch(
       pushAutoToast({
-        type: "success",
-        title: "Wishlist updated",
+        type: 'success',
+        title: 'Wishlist updated',
         message: product.name,
-        link: "/wishlist",
+        link: '/wishlist',
       }),
     );
   };
-
-  const pageNumbers = useMemo(() => {
-    // show a compact window
-    const windowSize = 5;
-    const half = Math.floor(windowSize / 2);
-    let start = Math.max(1, safePage - half);
-    let end = Math.min(totalPages, start + windowSize - 1);
-    start = Math.max(1, end - windowSize + 1);
-
-    const nums = [];
-    for (let i = start; i <= end; i += 1) nums.push(i);
-    return nums;
-  }, [safePage, totalPages]);
 
   if (loading) {
     return (
       <>
         <Header />
-        <div style={{ padding: 24, textAlign: "center", fontWeight: 800 }}>
+        <div style={{ padding: 24, textAlign: 'center', fontWeight: 800 }}>
           Loading products…
         </div>
         <Footer />
@@ -245,9 +250,9 @@ export default function Products() {
         <div
           style={{
             padding: 24,
-            textAlign: "center",
+            textAlign: 'center',
             fontWeight: 800,
-            color: "#b00020",
+            color: '#b00020',
           }}
         >
           {error}
@@ -261,27 +266,26 @@ export default function Products() {
     <>
       <Header />
 
-      <div className="products-page">
-        <section className="products-hero">
-          <div className="products-hero-inner">
-            <div className="products-hero-tag">IWS Decor</div>
-            <h1 className="products-hero-title">Our Collection</h1>
-            <p className="products-hero-sub">
-              Discover handcrafted luxury decor and statement lighting.
-            </p>
+      <div className="subcat-page">
+        <section className="subcat-hero">
+          <div className="subcat-hero-inner">
+            <div className="subcat-hero-tag">IWS Decor</div>
+            <h1 className="subcat-hero-title">{normalizedSubcategory || 'Subcategory'}</h1>
+            <p className="subcat-hero-sub">Explore products in this subcategory.</p>
           </div>
         </section>
 
-        <section className="products-layout">
-          <div className="products-layout-grid">
+        <section className="subcat-layout">
+          <div className="subcat-layout-grid">
             <button
               className="mobile-filter-btn"
               onClick={() => setShowFilters(!showFilters)}
             >
-              {showFilters ? "Hide Filters" : "Show Filters"}
+              {showFilters ? 'Hide Filters' : 'Show Filters'}
             </button>
+
             <div
-              className={`filters-wrapper ${showFilters ? "filters-open" : ""}`}
+              className={`filters-wrapper ${showFilters ? 'filters-open' : ''}`}
             >
               <ProductFilters
                 search={search}
@@ -341,19 +345,19 @@ export default function Products() {
               </div>
 
               {sorted.length === 0 ? (
-                <div style={{ marginTop: 28, textAlign: "center" }}>
+                <div style={{ marginTop: 28, textAlign: 'center' }}>
                   <div
                     style={{
                       fontFamily: "'Cormorant Garamond', serif",
                       fontSize: 44,
-                      color: "#1d1815",
+                      color: '#1d1815',
                       marginBottom: 10,
                       fontWeight: 800,
                     }}
                   >
                     No matches found
                   </div>
-                  <div style={{ color: "rgba(29,24,21,0.7)", fontWeight: 700 }}>
+                  <div style={{ color: 'rgba(29,24,21,0.7)', fontWeight: 700 }}>
                     Try adjusting filters or search terms.
                   </div>
                 </div>
@@ -367,7 +371,7 @@ export default function Products() {
                     disabled={safePage <= 1}
                     onClick={() => {
                       setPage((p) => Math.max(1, p - 1));
-                      window.scrollTo({ top: 0, behavior: "smooth" });
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
                   >
                     Previous
@@ -378,10 +382,10 @@ export default function Products() {
                       <button
                         key={n}
                         type="button"
-                        className={`page-number ${n === safePage ? "active" : ""}`}
+                        className={`page-number ${n === safePage ? 'active' : ''}`}
                         onClick={() => {
                           setPage(n);
-                          window.scrollTo({ top: 0, behavior: "smooth" });
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
                         }}
                       >
                         {n}
@@ -395,7 +399,7 @@ export default function Products() {
                     disabled={safePage >= totalPages}
                     onClick={() => {
                       setPage((p) => Math.min(totalPages, p + 1));
-                      window.scrollTo({ top: 0, behavior: "smooth" });
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
                   >
                     Next
@@ -411,3 +415,4 @@ export default function Products() {
     </>
   );
 }
+

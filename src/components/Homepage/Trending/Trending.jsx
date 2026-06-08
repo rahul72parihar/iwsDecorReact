@@ -4,19 +4,55 @@ import { Link } from "react-router-dom";
 
 import { addToCart } from "../../../features/cart/cartSlice";
 import { toggleWishlist } from "../../../features/wishlist/wishlistSlice";
-import { products as allProducts } from "../../../data/products";
+import { useEffect, useState } from 'react';
+
+import { listProducts } from '../../../firebase/productService';
+
 import { pushAutoToast } from "../../../store/toastSlice";
 
 function Trending() {
   const dispatch = useDispatch();
   const wishlistItems = useSelector((s) => s.wishlist?.items ?? []);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let alive = true;
+    const run = async () => {
+      setLoading(true);
+      try {
+        const list = await listProducts();
+        if (!alive) return;
+        // Simple trending: take featured/newest/bestSelling tagged items first.
+        const score = (p) => {
+          const tags = p?.tags ?? {};
+          return (tags.featured ? 10 : 0) + (tags.newest ? 5 : 0) + (tags.bestSelling ? 7 : 0) + (p?.rating ?? 0);
+        };
+        const sorted = [...list].sort((a, b) => score(b) - score(a));
+        setProducts(sorted.slice(0, 4));
+      } finally {
+        if (!alive) return;
+        setLoading(false);
+      }
+    };
+    run();
+    return () => {
+      alive = false;
+    };
+  }, []);
 
 
-  // Use real catalog products so Redux payloads match what reducers expect.
-  const products = allProducts.slice(0, 4);
+  if (loading) {
+    return (
+      <section className="trending-section">
+        <div style={{ padding: 18, fontWeight: 800, textAlign: 'center' }}>Loading featured products…</div>
+      </section>
+    );
+  }
 
   return (
     <section className="trending-section">
+
       <div className="section-header">
         <p className="section-tag">Featured Collection</p>
         <h2 className="section-title">Trending</h2>
@@ -82,8 +118,11 @@ function Trending() {
                 <div className="price-row">
                   <span className="current-price">₹{product.price}</span>
                   <span className="old-price">{product.oldPrice}</span>
-                  <span className="discount">{product.discount}</span>
+                  <span className="discount">
+                    {product.discountPercent ? `${product.discountPercent}% OFF` : ''}
+                  </span>
                 </div>
+
 
                 <button
                   className="add-cart-btn"
