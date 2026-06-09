@@ -23,11 +23,11 @@ function ProductCategoryMegaMenu({ category }) {
       {columns.map((col, ci) => (
         <div className="mega-column" key={ci}>
           <h4>
-            <Link
-              to={`/products?category=${encodeURIComponent(category.label)}`}
-            >
-              {category.label}
-            </Link>
+              <Link
+                to={`/categories/${category.slug}`}
+              >
+                {category.label}
+              </Link>
 
           </h4>
           {col.map((sub) => (

@@ -1,0 +1,44 @@
+/* CategoryProducts styles (placeholder)
+   Keeping minimal so layout remains controlled by existing shared components. */
+
+.category-page {
+  width: 100%;
+}
+
+.category-hero {
+  padding: 26px 16px;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.category-hero-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.category-hero-tag {
+  font-weight: 800;
+  color: #8a6b43;
+  margin-bottom: 6px;
+}
+
+.category-hero-title {
+  margin: 0;
+  font-size: 40px;
+  font-weight: 800;
+}
+
+.category-hero-sub {
+  margin: 10px 0 0;
+  color: rgba(0,0,0,0.65);
+  font-weight: 700;
+}
+
+.category-layout {
+  padding: 18px 16px 60px;
+}
+
+.category-layout-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+

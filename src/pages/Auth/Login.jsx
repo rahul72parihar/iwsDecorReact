@@ -41,7 +41,7 @@ export default function Login() {
     try {
       setLoading(true);
       await signInWithEmailPassword(email.trim(), password);
-      window.location.href = mode === 'admin' ? '/admin' : '/account/profile';
+      window.location.href = mode === 'admin' ? '/admin' : '/';
     } catch (err) {
       setError(err?.message || 'Login failed.');
     } finally {

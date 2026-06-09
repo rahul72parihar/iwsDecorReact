@@ -1,21 +1,154 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
+
 import "./HeaderSidebar.css";
+
+import { listCategories } from "../../firebase/categoryService";
+
+import useAuth from "../../auth/useAuth";
 
 function HeaderSidebar({ isOpen, onClose }) {
   const [openMenu, setOpenMenu] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+
+  const { user, signOutUser } = useAuth();
+
   const totalQuantity = useSelector((s) => s.cart?.totalQuantity ?? 0);
   const wishlistCount = useSelector((s) => s.wishlist?.items?.length ?? 0);
+
+
 
 
   const toggleMenu = (menu) => {
     setOpenMenu(openMenu === menu ? null : menu);
   };
 
+  useEffect(() => {
+    let alive = true;
+
+    const run = async () => {
+      setLoadingCategories(true);
+      try {
+        const list = await listCategories();
+        if (!alive) return;
+        setCategories(Array.isArray(list) ? list : []);
+      } catch (e) {
+        if (!alive) return;
+        setCategories([]);
+      } finally {
+        if (!alive) return;
+        setLoadingCategories(false);
+      }
+    };
+
+    // Load on first open (or first mount if already open).
+    if (isOpen) run();
+
+    return () => {
+      alive = false;
+    };
+  }, [isOpen]);
+
+  const categoryItems = useMemo(() => {
+    return (categories || []).map((c) => {
+      const name = c?.name || '';
+      const slug = c?.slug || '';
+      const subcategories = Array.isArray(c?.subcategories) ? c.subcategories : [];
+
+      return {
+        id: c?.id || slug,
+        name,
+        slug,
+        subcategories,
+        hasSubcategories: subcategories.length > 0,
+      };
+    });
+  }, [categories]);
+
   const handleNav = () => {
     if (onClose) onClose();
     setOpenMenu(null);
+  };
+
+  const renderCategoryLinks = () => {
+    if (loadingCategories && (!categoryItems || categoryItems.length === 0)) {
+      return (
+        <div style={{ padding: 12, color: "rgba(0,0,0,0.6)", fontWeight: 600 }}>
+          Loading categories…
+        </div>
+      );
+    }
+
+    if (!categoryItems || categoryItems.length === 0) {
+      return (
+        <div style={{ padding: 12, color: "rgba(0,0,0,0.6)", fontWeight: 600 }}>
+          No categories
+        </div>
+      );
+    }
+
+    return categoryItems.map((cat) => {
+      if (!cat?.slug) return null;
+
+      const topKey = String(cat.id || cat.slug);
+
+      if (!cat.hasSubcategories) {
+        return (
+          <Link
+            key={topKey}
+            to={`/categories/${cat.slug}`}
+            className="header-sidebar__link"
+            onClick={handleNav}
+          >
+            {cat.name || cat.slug}
+          </Link>
+        );
+      }
+
+      return (
+        <div
+          key={topKey}
+          className={`header-sidebar__item ${
+            openMenu === topKey ? "is-active" : ""
+          }`}
+        >
+          <button
+            type="button"
+            className="header-sidebar__dropdown-btn"
+            onClick={() => toggleMenu(topKey)}
+          >
+            <span>{cat.name || cat.slug}</span>
+            <span className="header-sidebar__chev">▾</span>
+          </button>
+
+          <div className="header-sidebar__mega-menu">
+            <div className="header-sidebar__mega-column">
+              {/* Main category */}
+              <Link
+                to={`/categories/${cat.slug}`}
+                onClick={handleNav}
+                style={{ fontWeight: 800 }}
+              >
+                {cat.name || cat.slug}
+              </Link>
+
+              {/* Subcategories */}
+              {cat.subcategories.map((sc) => (
+                <Link
+                  key={`${topKey}-${sc}`}
+                  to={`/subcategories/${encodeURIComponent(sc)}`}
+                  onClick={handleNav}
+                >
+                  {sc}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    });
   };
 
   return (
@@ -33,161 +166,8 @@ function HeaderSidebar({ isOpen, onClose }) {
         aria-hidden={!isOpen}
       >
         <div className="header-sidebar__content">
+          {renderCategoryLinks()}
 
-          <Link to="/" className="header-sidebar__link" onClick={handleNav}>
-            Living Room
-          </Link>
-
-
-          {/* BEDROOM */}
-          <div
-            className={`header-sidebar__item ${
-              openMenu === "bedroom" ? "is-active" : ""
-            }`}
-          >
-            <button
-              type="button"
-              className="header-sidebar__dropdown-btn"
-              onClick={() => toggleMenu("bedroom")}
-            >
-              <span>Bedroom</span>
-              <span className="header-sidebar__chev">▾</span>
-            </button>
-
-            <div className="header-sidebar__mega-menu">
-              <div className="header-sidebar__mega-column">
-                <h4 className="header-sidebar__mega-title">Beds</h4>
-                <Link to="/" onClick={handleNav}>
-                  King Size Beds
-                </Link>
-                <Link to="/" onClick={handleNav}>
-                  Queen Size Beds
-                </Link>
-                <Link to="/" onClick={handleNav}>
-                  Storage Beds
-                </Link>
-              </div>
-
-              <div className="header-sidebar__mega-column">
-                <h4 className="header-sidebar__mega-title">Wardrobes</h4>
-                <Link to="/" onClick={handleNav}>
-                  2 Door
-                </Link>
-                <Link to="/" onClick={handleNav}>
-                  3 Door
-                </Link>
-                <Link to="/" onClick={handleNav}>
-                  Sliding Wardrobes
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          <Link to="/" className="header-sidebar__link" onClick={handleNav}>
-            Dining
-          </Link>
-
-          {/* OFFICE */}
-          <div
-            className={`header-sidebar__item ${
-              openMenu === "office" ? "is-active" : ""
-            }`}
-          >
-            <button
-              type="button"
-              className="header-sidebar__dropdown-btn"
-              onClick={() => toggleMenu("office")}
-            >
-              <span>Office</span>
-              <span className="header-sidebar__chev">▾</span>
-            </button>
-
-            <div className="header-sidebar__mega-menu">
-              <div className="header-sidebar__mega-column">
-                <h4 className="header-sidebar__mega-title">Office Chairs</h4>
-                <Link to="/" onClick={handleNav}>
-                  Gaming Chairs
-                </Link>
-                <Link to="/" onClick={handleNav}>
-                  Ergonomic Chairs
-                </Link>
-                <Link to="/" onClick={handleNav}>
-                  Executive Chairs
-                </Link>
-              </div>
-
-              <div className="header-sidebar__mega-column">
-                <h4 className="header-sidebar__mega-title">Tables</h4>
-                <Link to="/" onClick={handleNav}>
-                  Study Tables
-                </Link>
-                <Link to="/" onClick={handleNav}>
-                  Computer Tables
-                </Link>
-                <Link to="/" onClick={handleNav}>
-                  Standing Desks
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          <Link to="/" className="header-sidebar__link" onClick={handleNav}>
-            Kitchen
-          </Link>
-          <Link to="/" className="header-sidebar__link" onClick={handleNav}>
-            Lighting
-          </Link>
-          <Link to="/" className="header-sidebar__link" onClick={handleNav}>
-            Decor
-          </Link>
-
-          {/* OUTDOOR */}
-          <div
-            className={`header-sidebar__item ${
-              openMenu === "outdoor" ? "is-active" : ""
-            }`}
-          >
-            <button
-              type="button"
-              className="header-sidebar__dropdown-btn"
-              onClick={() => toggleMenu("outdoor")}
-            >
-              <span>Outdoor</span>
-              <span className="header-sidebar__chev">▾</span>
-            </button>
-
-            <div className="header-sidebar__mega-menu">
-              <div className="header-sidebar__mega-column">
-                <h4 className="header-sidebar__mega-title">Garden</h4>
-                <Link to="/" onClick={handleNav}>
-                  Garden Chairs
-                </Link>
-                <Link to="/" onClick={handleNav}>
-                  Outdoor Tables
-                </Link>
-                <Link to="/" onClick={handleNav}>
-                  Swings
-                </Link>
-              </div>
-
-              <div className="header-sidebar__mega-column">
-                <h4 className="header-sidebar__mega-title">Balcony</h4>
-                <Link to="/" onClick={handleNav}>
-                  Balcony Sets
-                </Link>
-                <Link to="/" onClick={handleNav}>
-                  Planters
-                </Link>
-                <Link to="/" onClick={handleNav}>
-                  Lighting
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          <Link to="/" className="header-sidebar__link" onClick={handleNav}>
-            Sale
-          </Link>
           <div className="header-sidebar__quick-actions">
             <Link
               to="/search"
@@ -218,6 +198,41 @@ function HeaderSidebar({ isOpen, onClose }) {
                 <span className="header-sidebar__badge">{totalQuantity}</span>
               ) : null}
             </Link>
+
+            <Link
+              to="/account/profile"
+              className="header-sidebar__quick-link"
+              onClick={handleNav}
+            >
+              👤 Profile
+            </Link>
+
+            <Link
+              to="/account/orders"
+              className="header-sidebar__quick-link"
+              onClick={handleNav}
+            >
+              📦 Orders
+            </Link>
+
+            {user ? (
+              <button
+                type="button"
+                className="header-sidebar__quick-link"
+                onClick={async () => {
+                  try {
+                    await signOutUser();
+                    if (onClose) onClose();
+                  } catch (e) {
+                    // keep silent here; auth page will show proper messaging
+                    console.error(e);
+                  }
+                  setOpenMenu(null);
+                }}
+              >
+                🚪 Logout
+              </button>
+            ) : null}
           </div>
         </div>
       </aside>
@@ -226,4 +241,5 @@ function HeaderSidebar({ isOpen, onClose }) {
 }
 
 export default HeaderSidebar;
+
 

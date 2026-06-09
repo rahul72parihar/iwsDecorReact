@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import './ProductFilters.css';
 
-const CATEGORY_VALUES = [
+// Categories are normally static, but on /categories/:categoryId pages
+// we want to lock the category filter and (optionally) show only subcategories.
+// `availableCategories` is expected in the same format as checkbox labels.
+const CATEGORY_VALUES_FALLBACK = [
   'Chandeliers',
   'Pendant Lights',
   'Wall Lights',
@@ -10,11 +13,16 @@ const CATEGORY_VALUES = [
   'Brass Decor',
 ];
 
+
 export default function ProductFilters({
   search,
   setSearch,
   selectedCategories,
   setSelectedCategories,
+  // If provided, checkbox labels will be taken from this list instead
+  // of the static CATEGORY_VALUES_FALLBACK.
+  // Use this to show only allowed subcategories on category pages.
+  availableCategories,
   priceMin,
   priceMax,
   setPriceMin,
@@ -73,6 +81,8 @@ export default function ProductFilters({
     });
   };
 
+
+
   const clearAllFilters = () => {
     setSearch('');
     setSelectedCategories([]);
@@ -124,7 +134,7 @@ export default function ProductFilters({
         <div className="filter-block">
           <div className="filter-label">Categories</div>
           <div className="check-list">
-            {CATEGORY_VALUES.map((cat) => (
+            {(availableCategories?.length ? availableCategories : CATEGORY_VALUES_FALLBACK).map((cat) => (
               <label key={cat} className="check-item">
                 <input
                   type="checkbox"
@@ -136,6 +146,7 @@ export default function ProductFilters({
             ))}
           </div>
         </div>
+
 
         <div className="filter-block">
           <div className="filter-label">Price Range</div>

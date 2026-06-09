@@ -143,10 +143,39 @@ export default function App() {
             }
           />
 
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/checkout/shipping" element={<Shipping />} />
-          <Route path="/checkout/payment" element={<Payment />} />
-          <Route path="/checkout/success" element={<OrderSuccess />} />
+          <Route
+            path="/checkout"
+            element={
+              <ProtectedUserRoute>
+                <Checkout />
+              </ProtectedUserRoute>
+            }
+          />
+          <Route
+            path="/checkout/shipping"
+            element={
+              <ProtectedUserRoute>
+                <Shipping />
+              </ProtectedUserRoute>
+            }
+          />
+          <Route
+            path="/checkout/payment"
+            element={
+              <ProtectedUserRoute>
+                <Payment />
+              </ProtectedUserRoute>
+            }
+          />
+          <Route
+            path="/checkout/success"
+            element={
+              <ProtectedUserRoute>
+                <OrderSuccess />
+              </ProtectedUserRoute>
+            }
+          />
+
 
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
