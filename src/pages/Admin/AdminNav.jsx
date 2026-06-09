@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-
+import { signOutUser } from '../../firebase/authService';
 import './AdminNav.css';
 
 export default function AdminNav({ onNavigate }) {
@@ -44,6 +44,19 @@ export default function AdminNav({ onNavigate }) {
         <NavLink to="/admin/settings" className={linkClass} onClick={handleClick}>
           Settings
         </NavLink>
+        <button
+            type="button"
+            className="profile-logout-btn"
+            onClick={async () => {
+              try {
+                await signOutUser();
+                console.log("Logged out successfully");
+                window.location.href = "/login";
+              } catch (e) {
+                setError(e?.message || "Failed to log out");
+              }
+            }}
+          >LOGOUT </button>
       </nav>
 
       <div className="adminNav-footer">Use the left menu to manage the store</div>

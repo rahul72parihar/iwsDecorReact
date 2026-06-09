@@ -1,2 +1,212 @@
-:root{--settings-border:rgba(0,0,0,.1);--settings-muted:#666;--settings-error:#b00020;--settings-primary:#111;--settings-success:#0a7b3a}.settings-page{padding:24px}.settings-shell{max-width:720px;margin:0 auto}.settings-head h1{margin:0 0 6px}.settings-sub{color:var(--settings-muted);font-size:14px}.settings-tabs{display:flex;gap:10px;margin:16px 0}.settings-tab{border:1px solid rgba(0,0,0,.15);background:#fff;border-radius:999px;padding:10px 14px;cursor:pointer;font-weight:600;color:#222}.settings-tab.active{background:var(--settings-primary);border-color:var(--settings-primary);color:#fff}.settings-card{border:1px solid var(--settings-border);border-radius:12px;padding:20px}.settings-card-title{margin:0 0 12px}.settings-form{display:flex;flex-direction:column;gap:14px}.settings-field{display:flex;flex-direction:column;gap:6px}.settings-label{font-size:13px;color:#444}.settings-input{padding:10px 12px;border:1px solid rgba(0,0,0,.2);border-radius:10px}.settings-actions{display:flex;gap:12px}.settings-primary{background:var(--settings-primary);color:#fff;border:none;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:700}.settings-primary:disabled{opacity:.6;cursor:not-allowed}.settings-muted{color:var(--settings-muted);font-size:13px;margin-top:8px}.settings-error{color:var(--settings-error);font-size:13px}.settings-success{color:var(--settings-success);font-size:13px}
+.adminSettingsCard {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 24px;
+}
 
+.adminSettingsLoading {
+  color: #666;
+  font-size: 14px;
+}
+
+.adminSettingsTabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.adminSettingsTab {
+  border: 1px solid #ddd;
+  background: #fff;
+  padding: 10px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.adminSettingsTab:hover {
+  border-color: #111;
+}
+
+.adminSettingsTab.active {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+
+.adminUserInfo {
+  border: 1px solid #eee;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.adminUserInfoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.adminUserInfoRow:last-child {
+  border-bottom: none;
+}
+
+.adminUserInfoLabel {
+  color: #666;
+  font-size: 14px;
+}
+
+.adminUserInfoValue {
+  font-weight: 600;
+  color: #111;
+  text-align: right;
+  word-break: break-word;
+}
+
+.adminSettingsForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.adminSettingsForm label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.adminSettingsForm label span {
+  font-size: 14px;
+  font-weight: 600;
+  color: #222;
+}
+
+.adminSettingsForm input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  outline: none;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.adminSettingsForm input:focus {
+  border-color: #111;
+}
+
+.adminSettingsActions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.adminSettingsBtn {
+  border: none;
+  background: #111;
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.2s ease;
+}
+
+.adminSettingsBtn:hover {
+  opacity: 0.9;
+}
+
+.adminSettingsBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.adminSettingsBtnSecondary {
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #111;
+  padding: 12px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.adminSettingsBtnSecondary:hover {
+  background: #f7f7f7;
+}
+
+.adminPasswordField {
+  position: relative;
+}
+
+.adminPasswordField input {
+  padding-right: 80px;
+}
+
+.adminPasswordToggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+}
+
+.adminPasswordToggle:hover {
+  color: #111;
+}
+
+.adminSettingsError {
+  padding: 12px;
+  border-radius: 10px;
+  background: #fff2f2;
+  color: #d32f2f;
+  border: 1px solid #ffd5d5;
+  font-size: 14px;
+}
+
+.adminSettingsSuccess {
+  padding: 12px;
+  border-radius: 10px;
+  background: #f0fff4;
+  color: #2e7d32;
+  border: 1px solid #cdeed8;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .adminSettingsCard {
+    padding: 16px;
+  }
+
+  .adminSettingsTabs {
+    flex-wrap: wrap;
+  }
+
+  .adminUserInfoRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .adminUserInfoValue {
+    text-align: left;
+  }
+
+  .adminSettingsActions {
+    flex-direction: column;
+  }
+
+  .adminSettingsBtn,
+  .adminSettingsBtnSecondary {
+    width: 100%;
+  }
+}

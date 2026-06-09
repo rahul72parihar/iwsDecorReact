@@ -1,12 +1,22 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 
-import { listProducts, createOrUpdateProduct, deleteProduct } from '../../firebase/productService';
+import {
+  listProducts,
+  getProductCount,
+  createOrUpdateProduct,
+  deleteProduct,
+} from '../../firebase/productService';
 import { uploadProductImages } from '../../firebase/productUploadService';
 
 import { onAuthStateChanged } from 'firebase/auth';
 import auth from '../../firebase/firebaseAuth';
 
+import AdminNav from './AdminNav';
+
 import './Products.css';
+
+// Client-side page size — how many rows to show before "Load more"
+const PAGE_SIZE = 10;
 
 function toNumberOrNull(v) {
   const n = typeof v === 'string' && v.trim() !== '' ? Number(v) : v;
@@ -22,9 +32,6 @@ function makeEmptyForm() {
     brand: '',
     price: '',
     oldPrice: '',
-    // discountPercent: '',
-    // rating: '',
-    // reviewsCount: '',
     inStock: true,
     tags: {
       featured: false,
@@ -32,26 +39,35 @@ function makeEmptyForm() {
       bestSelling: false,
     },
     description: '',
-
-    // upload inputs
     mainFile: null,
     additionalFiles: [],
   };
 }
 
 export default function AdminProducts() {
-  const [user, setUser] = useState(null);
+  const [user, setUser]       = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const [items, setItems] = useState([]);
-  const [fetching, setFetching] = useState(false);
+  // ── All products (source of truth) ──────────────────────────
+  const [allItems, setAllItems]         = useState([]);
+  const [totalCount, setTotalCount]     = useState(null);
+  const [fetching, setFetching]         = useState(false);
 
-  const [form, setForm] = useState(makeEmptyForm());
-  const [selectedProductId, setSelectedProductId] = useState(null);
+  // ── Search ───────────────────────────────────────────────────
+  const [searchQuery, setSearchQuery]   = useState('');
 
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  // ── Client-side pagination ───────────────────────────────────
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
+  // ── Form / UI state ─────────────────────────────────────────
+  const [form, setForm]                             = useState(makeEmptyForm());
+  const [selectedProductId, setSelectedProductId]   = useState(null);
+  const [activeTab, setActiveTab]                   = useState('list');
+  const [uploading, setUploading]                   = useState(false);
+  const [error, setError]                           = useState('');
+  const [success, setSuccess]                       = useState('');
+
+  // ── Auth ─────────────────────────────────────────────────────
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u);
@@ -62,87 +78,114 @@ export default function AdminProducts() {
 
   const canEdit = !!user;
 
-  const refresh = async () => {
+  // ── Fetch all products once ──────────────────────────────────
+  const refresh = useCallback(async () => {
     setFetching(true);
     setError('');
     setSuccess('');
     try {
-      const list = await listProducts();
-      setItems(list);
+      const [list, count] = await Promise.all([
+        listProducts(),
+        getProductCount(),
+      ]);
+      setAllItems(list);
+      setTotalCount(count);
+      setVisibleCount(PAGE_SIZE); // reset pagination on every refresh
     } catch (e) {
       setError(e?.message || 'Failed to load products');
     } finally {
       setFetching(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (!canEdit) return;
     refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [canEdit]);
+  }, [canEdit, refresh]);
 
-  const selected = useMemo(() => {
-    if (!selectedProductId) return null;
-    return items.find((p) => p.id === selectedProductId) || null;
-  }, [items, selectedProductId]);
+  // ── Search filter (derived) ──────────────────────────────────
+  // Runs entirely in JS — no extra Firestore reads.
+  const filteredItems = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return allItems;
+    return allItems.filter(
+      (p) =>
+        p.name?.toLowerCase().includes(q)        ||
+        p.category?.toLowerCase().includes(q)    ||
+        p.subcategory?.toLowerCase().includes(q) ||
+        p.brand?.toLowerCase().includes(q)       ||
+        p.id?.toLowerCase().includes(q),
+    );
+  }, [allItems, searchQuery]);
 
-  const setField = (key, value) => {
+  // Reset visible count whenever the search changes
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [searchQuery]);
+
+  // ── Client-side pagination (derived) ────────────────────────
+  const visibleItems = useMemo(
+    () => filteredItems.slice(0, visibleCount),
+    [filteredItems, visibleCount],
+  );
+  const hasMore = visibleCount < filteredItems.length;
+
+  const loadMore = () =>
+    setVisibleCount((prev) => prev + PAGE_SIZE);
+
+  // ── Selected product ─────────────────────────────────────────
+  const selected = useMemo(
+    () => (selectedProductId ? allItems.find((p) => p.id === selectedProductId) ?? null : null),
+    [allItems, selectedProductId],
+  );
+
+  // ── Form helpers ─────────────────────────────────────────────
+  const setField = (key, value) =>
     setForm((prev) => ({ ...prev, [key]: value }));
-  };
 
-  const setTag = (key, value) => {
+  const setTag = (key, value) =>
     setForm((prev) => ({ ...prev, tags: { ...prev.tags, [key]: value } }));
-  };
 
-  const handlePickMain = (file) => {
+  const handlePickMain = (file) =>
     setForm((prev) => ({ ...prev, mainFile: file || null }));
-  };
 
-  const handlePickAdditional = (files) => {
-    const arr = Array.from(files || []);
-    setForm((prev) => ({ ...prev, additionalFiles: arr }));
-  };
+  const handlePickAdditional = (files) =>
+    setForm((prev) => ({ ...prev, additionalFiles: Array.from(files || []) }));
 
   const resetForm = () => {
     setForm(makeEmptyForm());
     setSelectedProductId(null);
+    setError('');
+    setSuccess('');
   };
 
   const onEdit = (p) => {
-    // Firestore doc data includes { id: storedId, ... }
-    // In our create/update we ensure `id` is present.
-    setSelectedProductId(p?.id ?? p?.id);
+    setSelectedProductId(p?.id ?? '');
     setForm({
       ...makeEmptyForm(),
-      id: p?.id ?? '',
-      name: p?.name ?? '',
-      category: p?.category ?? '',
+      id:          p?.id          ?? '',
+      name:        p?.name        ?? '',
+      category:    p?.category    ?? '',
       subcategory: p?.subcategory ?? '',
-      brand: p?.brand ?? '',
-      price: p?.price ?? '',
-      oldPrice: p?.oldPrice ?? '',
-    // discountPercent removed per request
-    // discountPercent: p?.discountPercent ?? '',
-    // rating removed per request
-    // rating: p?.rating ?? '',
-    // reviewsCount removed per request
-    // reviewsCount: p?.reviewsCount ?? '',
-      inStock: !!p?.inStock,
+      brand:       p?.brand       ?? '',
+      price:       p?.price       ?? '',
+      oldPrice:    p?.oldPrice    ?? '',
+      inStock:     !!p?.inStock,
       tags: {
-        featured: !!p?.tags?.featured,
-        newest: !!p?.tags?.newest,
+        featured:    !!p?.tags?.featured,
+        newest:      !!p?.tags?.newest,
         bestSelling: !!p?.tags?.bestSelling,
       },
-      description: p?.description ?? '',
-      mainFile: null,
+      description:     p?.description ?? '',
+      mainFile:        null,
       additionalFiles: [],
     });
+    setActiveTab('form');
+    setError('');
+    setSuccess('');
   };
 
-  const [uploading, setUploading] = useState(false);
-
-
+  // ── Submit ───────────────────────────────────────────────────
   const onSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -150,70 +193,51 @@ export default function AdminProducts() {
 
     const productId = (form.id || '').trim();
     if (!productId) {
-      setError('Product id is required (will also be used by the storefront UI).');
+      setError('Product ID is required.');
       return;
     }
 
     const data = {
-      id: productId,
-      name: form.name.trim(),
-      category: form.category.trim(),
+      id:          productId,
+      name:        form.name.trim(),
+      category:    form.category.trim(),
       subcategory: form.subcategory.trim(),
-      brand: form.brand.trim() || 'IWS Signature',
-      price: toNumberOrNull(form.price),
-      oldPrice: toNumberOrNull(form.oldPrice),
-      // discountPercent removed per request
-      // discountPercent: toNumberOrNull(form.discountPercent),
-      // rating removed per request
-      // rating: toNumberOrNull(form.rating),
-      // reviewsCount removed per request
-      // reviewsCount: toNumberOrNull(form.reviewsCount) ?? 0,
-      inStock: !!form.inStock,
+      brand:       form.brand.trim() || 'IWS Signature',
+      price:       toNumberOrNull(form.price),
+      oldPrice:    toNumberOrNull(form.oldPrice),
+      inStock:     !!form.inStock,
       tags: {
-        featured: !!form.tags?.featured,
-        newest: !!form.tags?.newest,
+        featured:    !!form.tags?.featured,
+        newest:      !!form.tags?.newest,
         bestSelling: !!form.tags?.bestSelling,
       },
       description: form.description.trim(),
-
-      // For storefront UI (ProductCard/ProductGallery)
-      // `image` will be set when we upload main image.
     };
 
     try {
       setUploading(true);
-
-      // If mainFile selected, upload & set `image`.
-      // If editing and no new mainFile, keep existing image URLs.
       let imagePatch = {};
 
       if (form.mainFile) {
-        const existing = selected;
         const uploaded = await uploadProductImages({
           productId,
-          mainFile: form.mainFile,
-          additionalFiles: form.additionalFiles,
-          existingMainUrl: existing?.image,
-          existingAdditionalUrls: existing?.additionalImageUrls || [],
-          deleteOldImages: false,
+          mainFile:               form.mainFile,
+          additionalFiles:        form.additionalFiles,
+          existingMainUrl:        selected?.image,
+          existingAdditionalUrls: selected?.additionalImageUrls || [],
+          deleteOldImages:        false,
         });
-
         imagePatch = uploaded;
-      } else {
-        // Ensure storefront still has an image; you can enforce requirement if desired.
-        const existing = selected;
-        if (existing?.image) {
-          imagePatch = { image: existing.image };
-        }
+      } else if (selected?.image) {
+        imagePatch = { image: selected.image };
       }
 
-      const merged = { ...data, ...imagePatch };
+      await createOrUpdateProduct(productId, { ...data, ...imagePatch });
 
-      await createOrUpdateProduct(productId, merged);
-
-      setSuccess('Saved successfully');
+      setSuccess('Product saved successfully.');
       resetForm();
       await refresh();
+      setActiveTab('list');
     } catch (e) {
       setError(e?.message || 'Failed to save product');
     } finally {
@@ -221,320 +245,414 @@ export default function AdminProducts() {
     }
   };
 
-  const onDelete = async () => {
-    if (!selectedProductId) return;
+  // ── Delete ───────────────────────────────────────────────────
+  const onDelete = async (productId) => {
+    if (!productId) return;
     setError('');
     setSuccess('');
     try {
-      await deleteProduct(selectedProductId);
-      setSuccess('Deleted');
-      resetForm();
+      await deleteProduct(productId);
+      setSuccess('Product deleted.');
+      if (selectedProductId === productId) resetForm();
       await refresh();
     } catch (e) {
       setError(e?.message || 'Failed to delete product');
     }
   };
 
-  if (loading) {
-    return <div className="admin-empty">Loading…</div>;
-  }
-
-  if (!canEdit) {
-    return (
-      <div className="admin-empty">
-        <div style={{ maxWidth: 680, margin: '0 auto' }}>
-          <h1 style={{ margin: 0, fontSize: 26 }}>Admin Products</h1>
-          <p style={{ color: '#666', fontWeight: 700, marginTop: 10 }}>
-            Please login to manage products.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
+  // ── Render ───────────────────────────────────────────────────
   return (
-    <div className="admin-products-page">
-      <div className="admin-products-head">
-        <div>
-          <h1>Admin Products</h1>
-          <div className="admin-products-sub">
-            Create / edit products and upload images (main + additional).
-          </div>
-        </div>
+    <div className="adminShell">
+      <AdminNav />
 
-        <div className="admin-products-actionsRow">
-          <button className="admin-btn" type="button" onClick={refresh} disabled={fetching}>
-            {fetching ? 'Refreshing…' : 'Refresh list'}
-          </button>
-          <button className="admin-btn primary" type="button" onClick={resetForm}>
-            New Product
-          </button>
-        </div>
-      </div>
-
-      <div className="admin-products-grid">
-        <div className="admin-products-tableCard">
-          {error ? <div className="admin-error">{error}</div> : null}
-          {success ? <div className="admin-success">{success}</div> : null}
-
-          <table className="admin-table" aria-label="Products table">
-            <thead>
-              <tr>
-                <th className="admin-th">Preview</th>
-                <th className="admin-th">Name</th>
-                <th className="admin-th">Category</th>
-                <th className="admin-th">Price</th>
-                <th className="admin-th">In stock</th>
-                <th className="admin-th">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.length === 0 ? (
-                <tr>
-                  <td colSpan={6}>
-                    <div className="admin-empty">No products yet.</div>
-                  </td>
-                </tr>
-              ) : (
-                items.map((p) => (
-                  <tr key={p?.id || p?.name}>
-                    <td>
-                      {p?.image ? (
-                        <img className="admin-thumb" src={p.image} alt={p.name || 'product'} />
-                      ) : (
-                        <div className="admin-thumb" />
-                      )}
-                    </td>
-                    <td>
-                      <div className="admin-rowTitle">{p?.name}</div>
-                      <div style={{ color: '#777', fontWeight: 700, fontSize: 12 }}>
-                        id: {p?.id}
-                      </div>
-                    </td>
-                    <td>{p?.category}</td>
-                    <td>₹{Number(p?.price || 0).toLocaleString('en-IN')}</td>
-                    <td>{p?.inStock ? 'Yes' : 'No'}</td>
-                    <td>
-                      <div className="admin-miniBtns">
-                        <button
-                          type="button"
-                          className="admin-linkBtn"
-                          onClick={() => onEdit(p)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          type="button"
-                          className="admin-linkBtn"
-                          onClick={() => {
-                            setSelectedProductId(p?.id);
-                          }}
-                        >
-                          Select
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+      <div className="adminMain">
+        <header className="adminDashHead">
+          <div>
+            <h1>Products</h1>
+            <p>
+              Create, edit, and manage your product catalogue.
+              {totalCount !== null && (
+                <span className="adminProductsTotalBadge">{totalCount} total</span>
               )}
-            </tbody>
-          </table>
+            </p>
+          </div>
 
-          {selectedProductId ? (
-            <div style={{ marginTop: 14 }}>
-              <button className="admin-btn danger" type="button" onClick={onDelete}>
-                Delete selected
-              </button>
-            </div>
-          ) : null}
-        </div>
+          <div className="adminProductsHeadActions">
+            <button
+              type="button"
+              className="adminSettingsBtnSecondary"
+              onClick={refresh}
+              disabled={fetching}
+            >
+              {fetching ? 'Refreshing…' : 'Refresh'}
+            </button>
 
-        <div className="admin-products-formCard">
-          <form className="admin-form" onSubmit={onSubmit}>
-            <div className="admin-field">
-              <div className="admin-label">Product ID (used by storefront)</div>
-              <input
-                className="admin-input"
-                value={form.id}
-                onChange={(e) => setField('id', e.target.value)}
-                placeholder="e.g. 1, 12, 21"
-                required
-              />
-              <div className="admin-inlineHint">
-                Your storefront loads products from `src/data/products.js` right now, so changing IDs here won’t affect it until you wire Firestore products into the storefront.
-              </div>
-            </div>
+            <button
+              type="button"
+              className="adminSettingsBtn"
+              onClick={() => {
+                resetForm();
+                setActiveTab('form');
+              }}
+            >
+              New Product
+            </button>
+          </div>
+        </header>
 
-            <div className="admin-field">
-              <div className="admin-label">Name</div>
-              <input
-                className="admin-input"
-                value={form.name}
-                onChange={(e) => setField('name', e.target.value)}
-                placeholder="e.g. Solstice Crystal Chandelier"
-                required
-              />
-            </div>
+        {loading ? (
+          <div className="adminSettingsLoading">Loading…</div>
+        ) : !canEdit ? (
+          <div className="adminSettingsError">Please log in to manage products.</div>
+        ) : (
+          <div className="adminSettingsCard">
 
-            <div className="admin-row">
-              <div className="admin-field">
-                <div className="admin-label">Category</div>
-                <input
-                  className="admin-input"
-                  value={form.category}
-                  onChange={(e) => setField('category', e.target.value)}
-                  placeholder="Chandeliers"
-                />
-              </div>
-              <div className="admin-field">
-                <div className="admin-label">Subcategory</div>
-                <input
-                  className="admin-input"
-                  value={form.subcategory}
-                  onChange={(e) => setField('subcategory', e.target.value)}
-                  placeholder="Crystal Chandeliers"
-                />
-              </div>
-            </div>
-
-            <div className="admin-field">
-              <div className="admin-label">Brand</div>
-              <input
-                className="admin-input"
-                value={form.brand}
-                onChange={(e) => setField('brand', e.target.value)}
-                placeholder="IWS Signature"
-              />
-            </div>
-
-            <div className="admin-row">
-              <div className="admin-field">
-                <div className="admin-label">Price</div>
-                <input
-                  className="admin-input"
-                  value={form.price}
-                  onChange={(e) => setField('price', e.target.value)}
-                  placeholder="189999"
-                />
-              </div>
-              <div className="admin-field">
-                <div className="admin-label">Old Price</div>
-                <input
-                  className="admin-input"
-                  value={form.oldPrice}
-                  onChange={(e) => setField('oldPrice', e.target.value)}
-                  placeholder="239999"
-                />
-              </div>
-            </div>
-
-            <div className="admin-row">
-              <div className="admin-field">
-                <div className="admin-label">In Stock</div>
-                <select
-                  className="admin-select"
-                  value={form.inStock ? 'yes' : 'no'}
-                  onChange={(e) => setField('inStock', e.target.value === 'yes')}
-                >
-                  <option value="yes">Yes</option>
-                  <option value="no">No</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="admin-field">
-              <div className="admin-label">Tags</div>
-              <div className="admin-products-actionsRow">
-                <label className="admin-linkBtn" style={{ cursor: 'pointer' }}>
-                  <input
-                    type="checkbox"
-                    checked={!!form.tags.featured}
-                    onChange={(e) => setTag('featured', e.target.checked)}
-                  />{' '}
-                  Featured
-                </label>
-                <label className="admin-linkBtn" style={{ cursor: 'pointer' }}>
-                  <input
-                    type="checkbox"
-                    checked={!!form.tags.newest}
-                    onChange={(e) => setTag('newest', e.target.checked)}
-                  />{' '}
-                  Newest
-                </label>
-                <label className="admin-linkBtn" style={{ cursor: 'pointer' }}>
-                  <input
-                    type="checkbox"
-                    checked={!!form.tags.bestSelling}
-                    onChange={(e) => setTag('bestSelling', e.target.checked)}
-                  />{' '}
-                  Best Selling
-                </label>
-              </div>
-            </div>
-
-            <div className="admin-field">
-              <div className="admin-label">Description</div>
-              <textarea
-                className="admin-textarea"
-                value={form.description}
-                onChange={(e) => setField('description', e.target.value)}
-                placeholder="Product description"
-              />
-            </div>
-
-            <div className="admin-field">
-              <div className="admin-label">Main Image</div>
-              <div className="admin-filePick">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handlePickMain(e.target.files?.[0])}
-                />
-                <div style={{ fontSize: 12, color: '#666', fontWeight: 700 }}>
-                  {form.mainFile ? form.mainFile.name : 'Optional (required for new product)'}
-                </div>
-              </div>
-            </div>
-
-            <div className="admin-field">
-              <div className="admin-label">Additional Images</div>
-              <div className="admin-filePick">
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={(e) => handlePickAdditional(e.target.files)}
-                />
-                <div style={{ fontSize: 12, color: '#666', fontWeight: 700 }}>
-                  {form.additionalFiles?.length ? `${form.additionalFiles.length} selected` : 'Optional'}
-                </div>
-              </div>
-            </div>
-
-            <div className="admin-formBtns">
-              <button className="admin-btn primary" type="submit" disabled={uploading || fetching}>
-                {uploading
-                  ? 'Uploading images…'
-                  : selectedProductId
-                    ? 'Save changes'
-                    : 'Create product'}
-              </button>
+            {/* ── Tabs ── */}
+            <div className="adminSettingsTabs">
               <button
-                className="admin-btn"
                 type="button"
-                onClick={() => {
-                  resetForm();
-                  setError('');
-                  setSuccess('');
-                }}
+                className={activeTab === 'list' ? 'adminSettingsTab active' : 'adminSettingsTab'}
+                onClick={() => { setError(''); setSuccess(''); setActiveTab('list'); }}
               >
-                Cancel
+                All Products
+              </button>
+
+              <button
+                type="button"
+                className={activeTab === 'form' ? 'adminSettingsTab active' : 'adminSettingsTab'}
+                onClick={() => { setError(''); setSuccess(''); setActiveTab('form'); }}
+              >
+                {selectedProductId ? 'Edit Product' : 'New Product'}
               </button>
             </div>
-          </form>
-        </div>
+
+            {/* ── Shared feedback ── */}
+            {error   && <div className="adminSettingsError"   style={{ marginBottom: 16 }}>{error}</div>}
+            {success && <div className="adminSettingsSuccess" style={{ marginBottom: 16 }}>{success}</div>}
+
+            {/* ══════════════════════════════════════
+                LIST TAB
+            ══════════════════════════════════════ */}
+            {activeTab === 'list' && (
+              <>
+                {/* ── Search bar ── */}
+                <div className="adminProductsSearchWrap">
+                  <div className="adminProductsSearchBox">
+                    <svg className="adminProductsSearchIcon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="9" cy="9" r="5.5" stroke="#aaa" strokeWidth="1.6"/>
+                      <path d="M13.5 13.5L17 17" stroke="#aaa" strokeWidth="1.6" strokeLinecap="round"/>
+                    </svg>
+                    <input
+                      type="search"
+                      className="adminProductsSearchInput"
+                      placeholder="Search by name, category, brand, or ID…"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    {searchQuery && (
+                      <button
+                        type="button"
+                        className="adminProductsSearchClear"
+                        onClick={() => setSearchQuery('')}
+                        aria-label="Clear search"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+
+                  {searchQuery && (
+                    <span className="adminProductsSearchMeta">
+                      {filteredItems.length === 0
+                        ? 'No results'
+                        : `${filteredItems.length} result${filteredItems.length !== 1 ? 's' : ''}`}
+                    </span>
+                  )}
+                </div>
+
+                {/* ── Table ── */}
+                {fetching && allItems.length === 0 ? (
+                  <div className="adminProductsEmpty">Loading products…</div>
+                ) : filteredItems.length === 0 ? (
+                  <div className="adminProductsEmpty">
+                    {searchQuery
+                      ? <>No products match <strong>"{searchQuery}"</strong>. Try a different search.</>
+                      : <>No products yet. Click <strong>New Product</strong> to add one.</>
+                    }
+                  </div>
+                ) : (
+                  <>
+                    <div className="adminProductsTable">
+                      <table aria-label="Products table">
+                        <thead>
+                          <tr>
+                            <th>Preview</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>In Stock</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {visibleItems.map((p) => (
+                            <tr
+                              key={p?.id || p?.name}
+                              className={selectedProductId === p?.id ? 'adminProductsRowSelected' : ''}
+                            >
+                              <td>
+                                {p?.image ? (
+                                  <img
+                                    className="adminProductsThumb"
+                                    src={p.image}
+                                    alt={p.name || 'product'}
+                                  />
+                                ) : (
+                                  <div className="adminProductsThumb adminProductsThumbEmpty" />
+                                )}
+                              </td>
+                              <td>
+                                <div className="adminProductsRowName">{p?.name}</div>
+                                <div className="adminProductsRowId">id: {p?.id}</div>
+                              </td>
+                              <td>{p?.category}</td>
+                              <td>₹{Number(p?.price || 0).toLocaleString('en-IN')}</td>
+                              <td>
+                                <span className={p?.inStock ? 'adminProductsBadgeIn' : 'adminProductsBadgeOut'}>
+                                  {p?.inStock ? 'In Stock' : 'Out of Stock'}
+                                </span>
+                              </td>
+                              <td>
+                                <div className="adminProductsRowActions">
+                                  <button
+                                    type="button"
+                                    className="adminProductsLinkBtn"
+                                    onClick={() => onEdit(p)}
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="adminProductsLinkBtn danger"
+                                    onClick={() => onDelete(p?.id)}
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* ── Pagination footer ── */}
+                    <div className="adminProductsPagination">
+                      <span className="adminProductsPaginationInfo">
+                        Showing {visibleItems.length} of {filteredItems.length}
+                        {searchQuery && totalCount !== null && filteredItems.length !== totalCount
+                          ? ` (filtered from ${totalCount})`
+                          : totalCount !== null
+                            ? ` products`
+                            : ''}
+                      </span>
+
+                      {hasMore && (
+                        <button
+                          type="button"
+                          className="adminSettingsBtnSecondary"
+                          onClick={loadMore}
+                        >
+                          Load more
+                        </button>
+                      )}
+                    </div>
+                  </>
+                )}
+              </>
+            )}
+
+            {/* ══════════════════════════════════════
+                FORM TAB
+            ══════════════════════════════════════ */}
+            {activeTab === 'form' && (
+              <form className="adminSettingsForm" onSubmit={onSubmit}>
+
+                <label>
+                  <span>Product ID</span>
+                  <input
+                    type="text"
+                    value={form.id}
+                    onChange={(e) => setField('id', e.target.value)}
+                    placeholder="e.g. chandelier-01"
+                    required
+                  />
+                  <span className="adminProductsHint">
+                    Used by the storefront to identify this product. Cannot be changed after creation.
+                  </span>
+                </label>
+
+                <label>
+                  <span>Name</span>
+                  <input
+                    type="text"
+                    value={form.name}
+                    onChange={(e) => setField('name', e.target.value)}
+                    placeholder="e.g. Solstice Crystal Chandelier"
+                    required
+                  />
+                </label>
+
+                <div className="adminProductsRow">
+                  <label>
+                    <span>Category</span>
+                    <input
+                      type="text"
+                      value={form.category}
+                      onChange={(e) => setField('category', e.target.value)}
+                      placeholder="Chandeliers"
+                    />
+                  </label>
+                  <label>
+                    <span>Subcategory</span>
+                    <input
+                      type="text"
+                      value={form.subcategory}
+                      onChange={(e) => setField('subcategory', e.target.value)}
+                      placeholder="Crystal Chandeliers"
+                    />
+                  </label>
+                </div>
+
+                <label>
+                  <span>Brand</span>
+                  <input
+                    type="text"
+                    value={form.brand}
+                    onChange={(e) => setField('brand', e.target.value)}
+                    placeholder="IWS Signature"
+                  />
+                </label>
+
+                <div className="adminProductsRow">
+                  <label>
+                    <span>Price (₹)</span>
+                    <input
+                      type="text"
+                      value={form.price}
+                      onChange={(e) => setField('price', e.target.value)}
+                      placeholder="189999"
+                    />
+                  </label>
+                  <label>
+                    <span>Old Price (₹)</span>
+                    <input
+                      type="text"
+                      value={form.oldPrice}
+                      onChange={(e) => setField('oldPrice', e.target.value)}
+                      placeholder="239999"
+                    />
+                  </label>
+                </div>
+
+                <label>
+                  <span>In Stock</span>
+                  <select
+                    value={form.inStock ? 'yes' : 'no'}
+                    onChange={(e) => setField('inStock', e.target.value === 'yes')}
+                  >
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </label>
+
+                <div className="adminProductsTagsField">
+                  <span className="adminProductsTagsLabel">Tags</span>
+                  <div className="adminProductsTags">
+                    {[
+                      { key: 'featured',    label: 'Featured'     },
+                      { key: 'newest',      label: 'Newest'       },
+                      { key: 'bestSelling', label: 'Best Selling' },
+                    ].map(({ key, label }) => (
+                      <label key={key} className="adminProductsTagChip">
+                        <input
+                          type="checkbox"
+                          checked={!!form.tags[key]}
+                          onChange={(e) => setTag(key, e.target.checked)}
+                        />
+                        {label}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <label>
+                  <span>Description</span>
+                  <textarea
+                    value={form.description}
+                    onChange={(e) => setField('description', e.target.value)}
+                    placeholder="Product description"
+                    rows={4}
+                  />
+                </label>
+
+                <label>
+                  <span>Main Image</span>
+                  <div className="adminProductsFilePick">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handlePickMain(e.target.files?.[0])}
+                    />
+                    <span className="adminProductsHint">
+                      {form.mainFile ? form.mainFile.name : 'Required for new products'}
+                    </span>
+                  </div>
+                </label>
+
+                <label>
+                  <span>Additional Images</span>
+                  <div className="adminProductsFilePick">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => handlePickAdditional(e.target.files)}
+                    />
+                    <span className="adminProductsHint">
+                      {form.additionalFiles?.length
+                        ? `${form.additionalFiles.length} file${form.additionalFiles.length > 1 ? 's' : ''} selected`
+                        : 'Optional'}
+                    </span>
+                  </div>
+                </label>
+
+                <div className="adminSettingsActions">
+                  <button
+                    type="submit"
+                    className="adminSettingsBtn"
+                    disabled={uploading || fetching}
+                  >
+                    {uploading
+                      ? 'Uploading…'
+                      : selectedProductId
+                        ? 'Save Changes'
+                        : 'Create Product'}
+                  </button>
+
+                  <button
+                    type="button"
+                    className="adminSettingsBtnSecondary"
+                    onClick={() => { resetForm(); setActiveTab('list'); }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
 }
-

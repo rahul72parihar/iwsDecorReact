@@ -1,20 +1,16 @@
-import { useMemo, useState } from 'react';
-
-import { getAuth, updateProfile, updatePassword } from 'firebase/auth';
-
-import Header from '../../components/Header/Header';
-import Footer from '../../components/Footer/Footer';
+import { useState } from 'react';
+import { updateProfile, updatePassword } from 'firebase/auth';
 
 import useAuth from '../../auth/useAuth';
+import AdminNav from './AdminNav';
 
 import './Settings.css';
 
 export default function AdminSettings() {
   const { user, loading } = useAuth();
-  const auth = useMemo(() => getAuth(), []);
 
   const [profileForm, setProfileForm] = useState({
-    displayName: '',
+    displayName: user?.displayName || '',
   });
 
   const [passwordForm, setPasswordForm] = useState({
@@ -24,13 +20,20 @@ export default function AdminSettings() {
 
   const [activeTab, setActiveTab] = useState('profile');
 
+  const [editingProfile, setEditingProfile] = useState(false);
+
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+
   const [savingProfile, setSavingProfile] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
+
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
   const onSaveProfile = async (e) => {
     e.preventDefault();
+
     if (!user) return;
 
     setError('');
@@ -38,11 +41,14 @@ export default function AdminSettings() {
     setSavingProfile(true);
 
     try {
-      const displayName = profileForm.displayName?.trim() || '';
-      await updateProfile(user, { displayName });
+      await updateProfile(user, {
+        displayName: profileForm.displayName.trim(),
+      });
+
       setSuccess('Profile updated successfully.');
-    } catch (e) {
-      setError(e?.message || 'Failed to update profile');
+      setEditingProfile(false);
+    } catch (err) {
+      setError(err?.message || 'Failed to update profile');
     } finally {
       setSavingProfile(false);
     }
@@ -50,6 +56,7 @@ export default function AdminSettings() {
 
   const onChangePassword = async (e) => {
     e.preventDefault();
+
     if (!user) return;
 
     setError('');
@@ -57,131 +64,295 @@ export default function AdminSettings() {
     setChangingPassword(true);
 
     try {
-      // NOTE: Firebase client SDK requires re-auth in real flows. If currentPassword is not
-      // valid / user not freshly authenticated, updatePassword may throw.
       await updatePassword(user, passwordForm.newPassword);
-      setSuccess('Password changed successfully.');
-      setPasswordForm({ currentPassword: '', newPassword: '' });
-    } catch (e) {
-      setError(e?.message || 'Failed to change password');
+
+      setSuccess('Password updated successfully.');
+
+      setPasswordForm({
+        currentPassword: '',
+        newPassword: '',
+      });
+    } catch (err) {
+      setError(err?.message || 'Failed to update password');
     } finally {
       setChangingPassword(false);
     }
   };
 
-  const displayName = user?.displayName || '';
-
   return (
-    <>
-      <Header />
+    <div className="adminShell">
+      <AdminNav />
 
-      <div className="settings-page">
-        <div className="settings-shell">
-          <div className="settings-head">
+      <div className="adminMain">
+        <header className="adminDashHead">
+          <div>
             <h1>Settings</h1>
-            <div className="settings-sub">Manage your profile and password</div>
+            <p>Manage administrator profile and account settings.</p>
           </div>
+        </header>
 
-          <div className="settings-tabs" role="tablist" aria-label="Settings sections">
+        <div className="adminSettingsCard">
+          <div className="adminSettingsTabs">
             <button
               type="button"
-              className={activeTab === 'profile' ? 'settings-tab active' : 'settings-tab'}
-              onClick={() => setActiveTab('profile')}
+              className={
+                activeTab === 'profile'
+                  ? 'adminSettingsTab active'
+                  : 'adminSettingsTab'
+              }
+              onClick={() => {
+                setError('');
+                setSuccess('');
+                setActiveTab('profile');
+              }}
             >
               Profile
             </button>
+
             <button
               type="button"
-              className={activeTab === 'password' ? 'settings-tab active' : 'settings-tab'}
-              onClick={() => setActiveTab('password')}
+              className={
+                activeTab === 'password'
+                  ? 'adminSettingsTab active'
+                  : 'adminSettingsTab'
+              }
+              onClick={() => {
+                setError('');
+                setSuccess('');
+                setActiveTab('password');
+              }}
             >
-              Change Password
+              Password
             </button>
           </div>
 
           {loading ? (
-            <div className="settings-card">Loading…</div>
+            <div className="adminSettingsLoading">
+              Loading...
+            </div>
           ) : !user ? (
-            <div className="settings-card">
-              <h2>You need to log in</h2>
-              <div className="settings-muted">Profile settings are available only for signed-in users.</div>
+            <div className="adminSettingsError">
+              No authenticated user found.
             </div>
           ) : (
-            <div className="settings-card">
-              {activeTab === 'profile' ? (
+            <>
+              {activeTab === 'profile' && (
                 <>
-                  <h2 className="settings-card-title">Profile</h2>
-                  <form onSubmit={onSaveProfile} className="settings-form">
-                    <label className="settings-field">
-                      <span className="settings-label">Display name</span>
-                      <input
-                        className="settings-input"
-                        value={profileForm.displayName || displayName}
-                        onChange={(e) => setProfileForm({ displayName: e.target.value })}
-                        placeholder="Your display name"
-                      />
-                    </label>
+                  <div className="adminUserInfo">
+                    <div className="adminUserInfoRow">
+                      <span className="adminUserInfoLabel">
+                        Email Address
+                      </span>
 
-                    {error ? <div className="settings-error">{error}</div> : null}
-                    {success ? <div className="settings-success">{success}</div> : null}
-
-                    <div className="settings-actions">
-                      <button className="settings-primary" type="submit" disabled={savingProfile}>
-                        {savingProfile ? 'Saving…' : 'Save'}
-                      </button>
-                    </div>
-                  </form>
-                </>
-              ) : (
-                <>
-                  <h2 className="settings-card-title">Change Password</h2>
-                  <form onSubmit={onChangePassword} className="settings-form">
-                    <label className="settings-field">
-                      <span className="settings-label">Current password</span>
-                      <input
-                        type="password"
-                        className="settings-input"
-                        value={passwordForm.currentPassword}
-                        onChange={(e) => setPasswordForm((f) => ({ ...f, currentPassword: e.target.value }))}
-                        placeholder="Current password"
-                      />
-                    </label>
-
-                    <label className="settings-field">
-                      <span className="settings-label">New password</span>
-                      <input
-                        type="password"
-                        className="settings-input"
-                        value={passwordForm.newPassword}
-                        onChange={(e) => setPasswordForm((f) => ({ ...f, newPassword: e.target.value }))}
-                        placeholder="New password"
-                      />
-                    </label>
-
-                    {error ? <div className="settings-error">{error}</div> : null}
-                    {success ? <div className="settings-success">{success}</div> : null}
-
-                    <div className="settings-actions">
-                      <button className="settings-primary" type="submit" disabled={changingPassword}>
-                        {changingPassword ? 'Updating…' : 'Update Password'}
-                      </button>
+                      <span className="adminUserInfoValue">
+                        {user.email || 'Not Available'}
+                      </span>
                     </div>
 
-                    <div className="settings-muted">
-                      For some accounts, Firebase may require re-authentication (current password) before
-                      updating.
+                    <div className="adminUserInfoRow">
+                      <span className="adminUserInfoLabel">
+                        Display Name
+                      </span>
+
+                      <span className="adminUserInfoValue">
+                        {user.displayName || 'Not Set'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <form
+                    className="adminSettingsForm"
+                    onSubmit={onSaveProfile}
+                  >
+                    {editingProfile && (
+                      <label>
+                        <span>Display Name</span>
+
+                        <input
+                          type="text"
+                          value={profileForm.displayName}
+                          onChange={(e) =>
+                            setProfileForm({
+                              displayName: e.target.value,
+                            })
+                          }
+                          placeholder="Enter display name"
+                        />
+                      </label>
+                    )}
+
+                    {error && (
+                      <div className="adminSettingsError">
+                        {error}
+                      </div>
+                    )}
+
+                    {success && (
+                      <div className="adminSettingsSuccess">
+                        {success}
+                      </div>
+                    )}
+
+                    <div className="adminSettingsActions">
+                      {!editingProfile ? (
+                        <button
+                          type="button"
+                          className="adminSettingsBtn"
+                          onClick={() => {
+                            setProfileForm({
+                              displayName:
+                                user.displayName || '',
+                            });
+
+                            setEditingProfile(true);
+                          }}
+                        >
+                          Edit Profile
+                        </button>
+                      ) : (
+                        <>
+                          <button
+                            type="submit"
+                            className="adminSettingsBtn"
+                            disabled={savingProfile}
+                          >
+                            {savingProfile
+                              ? 'Saving...'
+                              : 'Save Changes'}
+                          </button>
+
+                          <button
+                            type="button"
+                            className="adminSettingsBtnSecondary"
+                            onClick={() => {
+                              setEditingProfile(false);
+
+                              setProfileForm({
+                                displayName:
+                                  user.displayName || '',
+                              });
+
+                              setError('');
+                              setSuccess('');
+                            }}
+                          >
+                            Cancel
+                          </button>
+                        </>
+                      )}
                     </div>
                   </form>
                 </>
               )}
-            </div>
+
+              {activeTab === 'password' && (
+                <form
+                  className="adminSettingsForm"
+                  onSubmit={onChangePassword}
+                >
+                  <label>
+                    <span>Current Password</span>
+
+                    <div className="adminPasswordField">
+                      <input
+                        type={
+                          showCurrentPassword
+                            ? 'text'
+                            : 'password'
+                        }
+                        value={
+                          passwordForm.currentPassword
+                        }
+                        onChange={(e) =>
+                          setPasswordForm((prev) => ({
+                            ...prev,
+                            currentPassword:
+                              e.target.value,
+                          }))
+                        }
+                        placeholder="Current password"
+                      />
+
+                      <button
+                        type="button"
+                        className="adminPasswordToggle"
+                        onClick={() =>
+                          setShowCurrentPassword(
+                            (prev) => !prev
+                          )
+                        }
+                      >
+                        {showCurrentPassword
+                          ? 'Hide'
+                          : 'Show'}
+                      </button>
+                    </div>
+                  </label>
+
+                  <label>
+                    <span>New Password</span>
+
+                    <div className="adminPasswordField">
+                      <input
+                        type={
+                          showNewPassword
+                            ? 'text'
+                            : 'password'
+                        }
+                        value={passwordForm.newPassword}
+                        onChange={(e) =>
+                          setPasswordForm((prev) => ({
+                            ...prev,
+                            newPassword:
+                              e.target.value,
+                          }))
+                        }
+                        placeholder="New password"
+                      />
+
+                      <button
+                        type="button"
+                        className="adminPasswordToggle"
+                        onClick={() =>
+                          setShowNewPassword(
+                            (prev) => !prev
+                          )
+                        }
+                      >
+                        {showNewPassword
+                          ? 'Hide'
+                          : 'Show'}
+                      </button>
+                    </div>
+                  </label>
+
+                  {error && (
+                    <div className="adminSettingsError">
+                      {error}
+                    </div>
+                  )}
+
+                  {success && (
+                    <div className="adminSettingsSuccess">
+                      {success}
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    className="adminSettingsBtn"
+                    disabled={changingPassword}
+                  >
+                    {changingPassword
+                      ? 'Updating...'
+                      : 'Update Password'}
+                  </button>
+                </form>
+              )}
+            </>
           )}
         </div>
       </div>
-
-      <Footer />
-    </>
+    </div>
   );
 }
-
-

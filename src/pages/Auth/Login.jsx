@@ -10,13 +10,24 @@ import {
 import './AuthPages.css';
 import Footer from '../../components/Footer/Footer.jsx';
 
+const PRESETS = {
+  user: { email: 'test@user.com',   password: 'Test123',    label: 'User'  },
+  admin: { email: 'admin@admin.com', password: 'Admin@iws',  label: 'Admin' },
+};
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [mode, setMode]         = useState('user');
+  const [email, setEmail]       = useState(PRESETS.user.email);
+  const [password, setPassword] = useState(PRESETS.user.password);
+  const [error, setError]       = useState('');
+  const [loading, setLoading]   = useState(false);
 
+  const switchMode = (next) => {
+    setMode(next);
+    setEmail(PRESETS[next].email);
+    setPassword(PRESETS[next].password);
+    setError('');
+  };
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -30,9 +41,7 @@ export default function Login() {
     try {
       setLoading(true);
       await signInWithEmailPassword(email.trim(), password);
-      // Users can navigate manually to /account/profile.
-      window.location.href = '/account/profile';
-
+      window.location.href = mode === 'admin' ? '/admin' : '/account/profile';
     } catch (err) {
       setError(err?.message || 'Login failed.');
     } finally {
@@ -47,8 +56,27 @@ export default function Login() {
       <div className="auth-page">
         <div className="auth-layout auth-layout--single">
           <section className="auth-card">
-            <h1>Login</h1>
-            <p className="auth-subtitle">Sign in to your account.</p>
+
+            {/* ── Mode toggle ── */}
+            <div className="auth-mode-toggle">
+              {Object.entries(PRESETS).map(([key, { label }]) => (
+                <button
+                  key={key}
+                  type="button"
+                  className={`auth-mode-btn${mode === key ? ' active' : ''}`}
+                  onClick={() => switchMode(key)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            <h1>{mode === 'admin' ? 'Admin Login' : 'Login'}</h1>
+            <p className="auth-subtitle">
+              {mode === 'admin'
+                ? 'Sign in to the admin dashboard.'
+                : 'Sign in to your account.'}
+            </p>
 
             <form onSubmit={onSubmit} className="auth-form">
               <label className="auth-field">
@@ -75,44 +103,50 @@ export default function Login() {
                 />
               </label>
 
-              {error ? <div className="auth-error">{error}</div> : null}
+              {error && <div className="auth-error">{error}</div>}
 
               <button type="submit" disabled={loading} className="auth-primary-btn">
-                {loading ? 'Signing in…' : 'Login'}
+                {loading ? 'Signing in…' : `Login as ${PRESETS[mode].label}`}
               </button>
 
-              <div className="auth-divider">or</div>
+              {/* Google sign-in — only for regular users */}
+              {mode === 'user' && (
+                <>
+                  <div className="auth-divider">or</div>
 
-              <button
-                type="button"
-                disabled={loading}
-                className="auth-secondary-btn"
-                onClick={async () => {
-                  setError('');
-                  setLoading(true);
-                  try {
-                    await signInWithGooglePopup();
-                    window.location.href = '/account/profile';
-                  } catch (err) {
-                    setError(err?.message || 'Google sign-in failed.');
-                  } finally {
-                    setLoading(false);
-                  }
-                }}
-              >
-                {loading ? 'Signing in…' : 'Continue with Google'}
-              </button>
+                  <button
+                    type="button"
+                    disabled={loading}
+                    className="auth-secondary-btn"
+                    onClick={async () => {
+                      setError('');
+                      setLoading(true);
+                      try {
+                        await signInWithGooglePopup();
+                        window.location.href = '/account/profile';
+                      } catch (err) {
+                        setError(err?.message || 'Google sign-in failed.');
+                      } finally {
+                        setLoading(false);
+                      }
+                    }}
+                  >
+                    {loading ? 'Signing in…' : 'Continue with Google'}
+                  </button>
+                </>
+              )}
 
-
-              <div className="auth-footer">
-                New here? <Link to="/register">Create an account</Link>
-              </div>
+              {mode === 'user' && (
+                <div className="auth-footer">
+                  New here? <Link to="/register">Create an account</Link>
+                </div>
+              )}
             </form>
           </section>
         </div>
       </div>
+
       <Footer />
     </div>
   );
 }
-
