@@ -8,6 +8,10 @@ import {
 } from '../../firebase/productService';
 import { uploadProductImages } from '../../firebase/productUploadService';
 
+import { listCategories } from '../../firebase/categoryService';
+import { getCategorySubcategories } from '../../firebase/subcategoryService';
+
+
 import { onAuthStateChanged } from 'firebase/auth';
 import auth from '../../firebase/firebaseAuth';
 
@@ -78,7 +82,15 @@ export default function AdminProducts() {
 
   const canEdit = !!user;
 
+  // ── Category / Subcategory dropdown data ─────────────────────
+  const [allCategories, setAllCategories] = useState([]);
+  const [subcategoriesForSelectedCategory, setSubcategoriesForSelectedCategory] = useState([]);
+  const [loadingTaxonomy, setLoadingTaxonomy] = useState(false);
+
+
+
   // ── Fetch all products once ──────────────────────────────────
+
   const refresh = useCallback(async () => {
     setFetching(true);
     setError('');
@@ -97,6 +109,45 @@ export default function AdminProducts() {
       setFetching(false);
     }
   }, []);
+
+  const refreshTaxonomy = useCallback(async () => {
+    setLoadingTaxonomy(true);
+    try {
+      const cats = await listCategories();
+      setAllCategories(Array.isArray(cats) ? cats : []);
+    } catch (e) {
+      setError(e?.message || 'Failed to load categories');
+    } finally {
+      setLoadingTaxonomy(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Load taxonomy for dropdowns on mount.
+    refreshTaxonomy();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshTaxonomy]);
+
+
+  const refreshSubcategoriesForCategory = useCallback(async (categoryId) => {
+    const nextCategoryId = (categoryId || '').trim();
+    if (!nextCategoryId) {
+      setSubcategoriesForSelectedCategory([]);
+      return;
+    }
+
+    setLoadingTaxonomy(true);
+    try {
+      const subs = await getCategorySubcategories(nextCategoryId);
+      setSubcategoriesForSelectedCategory(Array.isArray(subs) ? subs : []);
+    } catch (e) {
+      setError(e?.message || 'Failed to load subcategories');
+      setSubcategoriesForSelectedCategory([]);
+    } finally {
+      setLoadingTaxonomy(false);
+    }
+  }, []);
+
 
   useEffect(() => {
     if (!canEdit) return;
@@ -160,17 +211,19 @@ export default function AdminProducts() {
   };
 
   const onEdit = (p) => {
+    const nextCategory = p?.category ?? '';
+
     setSelectedProductId(p?.id ?? '');
     setForm({
       ...makeEmptyForm(),
-      id:          p?.id          ?? '',
-      name:        p?.name        ?? '',
-      category:    p?.category    ?? '',
-      subcategory: p?.subcategory ?? '',
-      brand:       p?.brand       ?? '',
-      price:       p?.price       ?? '',
-      oldPrice:    p?.oldPrice    ?? '',
-      inStock:     !!p?.inStock,
+      id:           p?.id          ?? '',
+      name:         p?.name        ?? '',
+      category:     nextCategory,
+      subcategory:  p?.subcategory ?? '',
+      brand:        p?.brand       ?? '',
+      price:        p?.price       ?? '',
+      oldPrice:     p?.oldPrice    ?? '',
+      inStock:      !!p?.inStock,
       tags: {
         featured:    !!p?.tags?.featured,
         newest:      !!p?.tags?.newest,
@@ -180,6 +233,10 @@ export default function AdminProducts() {
       mainFile:        null,
       additionalFiles: [],
     });
+
+    // Ensure the subcategory dropdown matches the selected category.
+    refreshSubcategoriesForCategory(nextCategory);
+
     setActiveTab('form');
     setError('');
     setSuccess('');
@@ -192,6 +249,7 @@ export default function AdminProducts() {
     setSuccess('');
 
     const productId = (form.id || '').trim();
+
     if (!productId) {
       setError('Product ID is required.');
       return;
@@ -203,6 +261,7 @@ export default function AdminProducts() {
       category:    form.category.trim(),
       subcategory: form.subcategory.trim(),
       brand:       form.brand.trim() || 'IWS Signature',
+
       price:       toNumberOrNull(form.price),
       oldPrice:    toNumberOrNull(form.oldPrice),
       inStock:     !!form.inStock,
@@ -506,23 +565,43 @@ export default function AdminProducts() {
                 <div className="adminProductsRow">
                   <label>
                     <span>Category</span>
-                    <input
-                      type="text"
-                      value={form.category}
-                      onChange={(e) => setField('category', e.target.value)}
-                      placeholder="Chandeliers"
-                    />
+                    <select
+                      value={form.category || ''}
+                      onChange={(e) => {
+                        const nextCategory = e.target.value;
+                        setField('category', nextCategory);
+                        // When category changes, reset subcategory to force valid selection.
+                        setField('subcategory', '');
+                        refreshSubcategoriesForCategory(nextCategory);
+                      }}
+                      disabled={loadingTaxonomy || !canEdit}
+                    >
+                      <option value="">Select a category…</option>
+                      {allCategories.map((c) => (
+                        <option key={c?.id} value={c?.id}>
+                          {c?.name ? `${c.name} (${c.id})` : c?.id}
+                        </option>
+                      ))}
+                    </select>
                   </label>
+
                   <label>
                     <span>Subcategory</span>
-                    <input
-                      type="text"
-                      value={form.subcategory}
+                    <select
+                      value={form.subcategory || ''}
                       onChange={(e) => setField('subcategory', e.target.value)}
-                      placeholder="Crystal Chandeliers"
-                    />
+                      disabled={loadingTaxonomy || !form.category}
+                    >
+                      <option value="">Select a subcategory…</option>
+                      {subcategoriesForSelectedCategory.map((s) => (
+                        <option key={s} value={s}>
+                          {s}
+                        </option>
+                      ))}
+                    </select>
                   </label>
                 </div>
+
 
                 <label>
                   <span>Brand</span>
