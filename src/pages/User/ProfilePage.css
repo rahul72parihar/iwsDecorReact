@@ -110,3 +110,135 @@
   opacity:.6;
   cursor:not-allowed;
 }
+
+/* ── Tabs ─────────────────────────────── */
+.profile-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--color-border-tertiary);
+  margin-top: 20px;
+}
+
+.profile-tab-btn {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  margin-bottom: -1px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.profile-tab-btn:hover {
+  color: var(--color-text-primary);
+}
+
+.profile-tab-btn.active {
+  color: var(--color-text-primary);
+  border-bottom-color: currentColor;
+}
+
+/* ── Address list ─────────────────────── */
+.address-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.address-card {
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-md);
+  padding: 14px 16px;
+}
+
+.address-card--default {
+  border-color: var(--color-border-info);
+}
+
+.address-default-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: var(--color-background-info);
+  color: var(--color-text-info);
+  margin-bottom: 8px;
+}
+
+.address-name {
+  font-weight: 500;
+  font-size: 14px;
+  margin: 0 0 4px;
+}
+
+.address-line {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0 0 2px;
+}
+
+.address-landmark {
+  font-style: italic;
+}
+
+.address-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+/* ── Danger button ────────────────────── */
+.profile-danger-btn {
+  background: none;
+  border: 0.5px solid var(--color-border-danger);
+  color: var(--color-text-danger);
+  padding: 6px 14px;
+  border-radius: var(--border-radius-md);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.profile-danger-btn:hover {
+  background: var(--color-background-danger);
+}
+
+.profile-danger-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.profile-danger-btn {
+  background: none;
+  border: 0.5px solid #e24b4a;
+  border-radius: 10px;
+  color: #e24b4a;
+  padding: 6px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.profile-danger-btn:hover {
+  background: #fcebeb;
+  color: #a32d2d;
+  border-color: #a32d2d;
+}
+
+.profile-danger-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.profile-success {
+  padding: 10px 14px;
+  border-radius: var(--border-radius-md);
+  border: 0.5px solid #3b6d11;
+  background: #eaf3de;
+  color: #3b6d11;
+  font-size: 13px;
+}

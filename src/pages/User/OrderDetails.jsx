@@ -6,10 +6,54 @@ import { getOrderByIdForUser } from '../../firebase/orderService';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 
+import './OrderDetails.css';
+
+const STATUS_STEPS = ['placed', 'confirmed', 'processing', 'shipped', 'delivered'];
+
+function StatusPipeline({ status }) {
+  const s = (status ?? 'placed').toLowerCase();
+  const isCancelled = s === 'cancelled';
+  const currentIdx = STATUS_STEPS.indexOf(s);
+
+  if (isCancelled) {
+    return (
+      <div className="od-pipeline od-pipeline--cancelled">
+        <span className="od-pipeline-label">Order cancelled</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="od-pipeline">
+      {STATUS_STEPS.map((step, i) => {
+        const done = i <= currentIdx;
+        const active = i === currentIdx;
+        return (
+          <div key={step} className={`od-pipeline-step ${done ? 'done' : ''} ${active ? 'active' : ''}`}>
+            <div className="od-pipeline-dot">
+              {done && (
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <path d="M2 5l2.2 2.2L8 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
+            </div>
+            {i < STATUS_STEPS.length - 1 && <div className="od-pipeline-line" />}
+            <span className="od-pipeline-step-label">{step}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function StatusBadge({ status }) {
+  const s = (status ?? 'placed').toLowerCase();
+  return <span className={`order-status status--${s}`}>{s}</span>;
+}
+
 export default function OrderDetails() {
   const { orderId } = useParams();
   const navigate = useNavigate();
-
   const { user, loading } = useAuth();
 
   const [order, setOrder] = useState(null);
@@ -20,7 +64,6 @@ export default function OrderDetails() {
 
   useEffect(() => {
     if (!canFetch) return;
-
     let active = true;
     (async () => {
       setFetching(true);
@@ -28,11 +71,7 @@ export default function OrderDetails() {
       try {
         const o = await getOrderByIdForUser(user.uid, orderId);
         if (!active) return;
-        if (!o) {
-          setOrder(null);
-          setError('Order not found.');
-          return;
-        }
+        if (!o) { setOrder(null); setError('Order not found.'); return; }
         setOrder(o);
       } catch (e) {
         console.error(e);
@@ -42,163 +81,159 @@ export default function OrderDetails() {
         if (active) setFetching(false);
       }
     })();
-
-    return () => {
-      active = false;
-    };
+    return () => { active = false; };
   }, [canFetch, orderId, user]);
 
   const totals = order?.totals ?? {};
   const items = Array.isArray(order?.items) ? order.items : [];
 
   return (
-    <div style={{ minHeight: 400 }}>
+    <div className="od-root">
       <Header />
 
-      <div style={{ padding: 24, maxWidth: 980, margin: '0 auto' }}>
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 10 }}>
-          <h1 style={{ margin: 0 }}>Order Details</h1>
-          <button
-            type="button"
-            onClick={() => navigate('/account/orders')}
-            style={{
-              marginLeft: 'auto',
-              border: '1px solid rgba(0,0,0,0.14)',
-              background: 'white',
-              borderRadius: 12,
-              padding: '10px 14px',
-              cursor: 'pointer',
-              fontWeight: 900,
-            }}
-          >
-            Back
+      <main className="od-page">
+
+        {/* ── Top bar ── */}
+        <div className="od-topbar">
+          <button type="button" className="od-back-btn" onClick={() => navigate('/account/orders')}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Orders
           </button>
+          <h1 className="od-title">Order Details</h1>
         </div>
 
-        {fetching || loading ? <div style={{ marginTop: 14 }}>Loading...</div> : null}
-        {error ? <div style={{ marginTop: 14, color: 'crimson', fontWeight: 900 }}>{error}</div> : null}
+        {/* ── States ── */}
+        {(fetching || loading) && (
+          <div className="orders-state">
+            <div className="orders-spinner" />
+            <p>Loading order…</p>
+          </div>
+        )}
 
-        {!fetching && !error && order ? (
-          <div style={{ marginTop: 14, display: 'grid', gap: 12 }}>
-            <div
-              style={{
-                padding: 16,
-                borderRadius: 18,
-                background: 'rgba(255,255,255,0.9)',
-                border: '1px solid rgba(0,0,0,0.06)',
-                boxShadow: '0 14px 38px rgba(0,0,0,0.03)',
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'flex-start' }}>
+        {error && !fetching && (
+          <div className="orders-state orders-state--error">
+            <i className="ph ph-warning-circle" />
+            <p>{error}</p>
+          </div>
+        )}
+
+        {/* ── Content ── */}
+        {!fetching && !error && order && (
+          <div className="od-grid">
+
+            {/* ── Summary card ── */}
+            <div className="od-card">
+              <div className="od-card-head">
                 <div>
-                  <div style={{ fontWeight: 950, fontSize: 18 }}>Order #{order.id}</div>
-                  <div style={{ marginTop: 6, color: 'rgba(29,24,21,0.65)', fontWeight: 800, fontSize: 13 }}>
-                    Status: {order.status ?? 'placed'}
-                  </div>
+                  <p className="od-order-id">Order #{order.id}</p>
+                  {order.createdAt && (
+                    <p className="od-order-date">
+                      <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                        <rect x="1" y="2" width="11" height="10" rx="2" stroke="currentColor" strokeWidth="1.2" />
+                        <path d="M4 1v2M9 1v2M1 5h11" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                      </svg>
+                      {new Date(order.createdAt?.seconds ? order.createdAt.seconds * 1000 : order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </p>
+                  )}
                 </div>
-
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontWeight: 950, color: '#1d1815' }}>₹{Number(totals.total ?? 0).toLocaleString('en-IN')}</div>
-                  <div style={{ marginTop: 6, color: 'rgba(29,24,21,0.65)', fontWeight: 800, fontSize: 13 }}>
-                    Payment method: {order.paymentMethod ?? '—'}
-                  </div>
+                <div className="od-card-head-right">
+                  <p className="od-total-amount">₹{Number(totals.total ?? 0).toLocaleString('en-IN')}</p>
+                  <StatusBadge status={order.status} />
                 </div>
               </div>
 
-              {order.shippingAddress ? (
-                <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(0,0,0,0.08)' }}>
-                  <div style={{ fontWeight: 950 }}>Shipping address</div>
-                  <div style={{ marginTop: 6, color: 'rgba(29,24,21,0.75)', fontWeight: 800, fontSize: 13, lineHeight: 1.5 }}>
-                    {order.shippingAddress.fullName} • {order.shippingAddress.phone}
-                    <br />
-                    {order.shippingAddress.line1}
-                    {order.shippingAddress.line2 ? `, ${order.shippingAddress.line2}` : ''}
-                    <br />
-                    {order.shippingAddress.city}, {order.shippingAddress.state} - {order.shippingAddress.pincode}
-                    <br />
-                    {order.shippingAddress.country}
-                  </div>
+              {/* status pipeline */}
+              <div className="od-pipeline-wrap">
+                <StatusPipeline status={order.status} />
+              </div>
+
+              {/* payment */}
+              {order.paymentMethod && (
+                <div className="od-meta-row">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <rect x="1" y="3" width="12" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.2" />
+                    <path d="M1 6h12" stroke="currentColor" strokeWidth="1.2" />
+                  </svg>
+                  <span>{order.paymentMethod}</span>
                 </div>
-              ) : null}
+              )}
             </div>
 
-            <div
-              style={{
-                padding: 16,
-                borderRadius: 18,
-                background: 'rgba(255,255,255,0.9)',
-                border: '1px solid rgba(0,0,0,0.06)',
-              }}
-            >
-              <div style={{ fontWeight: 950, marginBottom: 10 }}>Items</div>
+            {/* ── Shipping address ── */}
+            {order.shippingAddress && (
+              <div className="od-card">
+                <p className="od-section-label">Shipping address</p>
+                <div className="od-address">
+                  <p className="od-address-name">
+                    {order.shippingAddress.fullName}
+                    {order.shippingAddress.phone && <span className="od-address-phone"> · {order.shippingAddress.phone}</span>}
+                  </p>
+                  <p className="od-address-line">
+                    {order.shippingAddress.line1}
+                    {order.shippingAddress.line2 ? `, ${order.shippingAddress.line2}` : ''}
+                  </p>
+                  <p className="od-address-line">
+                    {order.shippingAddress.city}, {order.shippingAddress.state} – {order.shippingAddress.pincode}
+                  </p>
+                  <p className="od-address-line">{order.shippingAddress.country}</p>
+                </div>
+              </div>
+            )}
+
+            {/* ── Items ── */}
+            <div className="od-card">
+              <p className="od-section-label">Items ({items.length})</p>
 
               {items.length === 0 ? (
-                <div style={{ color: 'rgba(29,24,21,0.65)', fontWeight: 800 }}>No items found.</div>
+                <p className="od-empty-items">No items found.</p>
               ) : (
-                <div style={{ display: 'grid', gap: 12 }}>
+                <div className="od-items">
                   {items.map((it) => (
-                    <div
-                      key={it.id}
-                      style={{
-                        display: 'flex',
-                        gap: 12,
-                        alignItems: 'center',
-                        padding: 12,
-                        borderRadius: 14,
-                        border: '1px solid rgba(0,0,0,0.06)',
-                      }}
-                    >
-                      {it.image ? (
-                        <img
-                          src={it.image}
-                          alt={it.name}
-                          style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 10 }}
-                        />
-                      ) : null}
-
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontWeight: 950, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {it.name}
-                        </div>
-                        <div style={{ marginTop: 4, color: 'rgba(29,24,21,0.7)', fontWeight: 800, fontSize: 13 }}>
-                          {it.quantity} × ₹{Number(it.price).toLocaleString('en-IN')}
-                        </div>
+                    <div key={it.id} className="od-item">
+                      {it.image
+                        ? <img src={it.image} alt={it.name} className="od-item-img" />
+                        : <div className="od-item-img od-item-img--placeholder" />
+                      }
+                      <div className="od-item-info">
+                        <p className="od-item-name">{it.name}</p>
+                        <p className="od-item-qty">{it.quantity} × ₹{Number(it.price).toLocaleString('en-IN')}</p>
                       </div>
-
-                      <div style={{ fontWeight: 950, color: '#1d1815' }}>₹{Number(it.subtotal ?? it.price * it.quantity).toLocaleString('en-IN')}</div>
+                      <p className="od-item-subtotal">₹{Number(it.subtotal ?? it.price * it.quantity).toLocaleString('en-IN')}</p>
                     </div>
                   ))}
                 </div>
               )}
 
-              <div style={{ marginTop: 14, height: 1, background: 'rgba(0,0,0,0.08)' }} />
-
-              <div style={{ marginTop: 12, display: 'grid', gap: 8, fontWeight: 800 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span>Subtotal</span>
-                  <span>₹{Number(totals.subtotal ?? 0).toLocaleString('en-IN')}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span>Shipping</span>
-                  <span>₹{Number(totals.shipping ?? 0).toLocaleString('en-IN')}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span>Tax</span>
-                  <span>₹{Number(totals.tax ?? 0).toLocaleString('en-IN')}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 950, color: '#1d1815', fontSize: 18 }}>
-                  <span>Total</span>
-                  <span>₹{Number(totals.total ?? 0).toLocaleString('en-IN')}</span>
+              {/* ── Totals ── */}
+              <div className="od-totals">
+                <div className="od-totals-inner">
+                  <div className="od-totals-row">
+                    <span>Subtotal</span>
+                    <span>₹{Number(totals.subtotal ?? 0).toLocaleString('en-IN')}</span>
+                  </div>
+                  <div className="od-totals-row">
+                    <span>Shipping</span>
+                    <span>₹{Number(totals.shipping ?? 0).toLocaleString('en-IN')}</span>
+                  </div>
+                  <div className="od-totals-row">
+                    <span>Tax</span>
+                    <span>₹{Number(totals.tax ?? 0).toLocaleString('en-IN')}</span>
+                  </div>
+                  <div className="od-totals-row od-totals-row--total">
+                    <span>Total</span>
+                    <span>₹{Number(totals.total ?? 0).toLocaleString('en-IN')}</span>
+                  </div>
                 </div>
               </div>
             </div>
+
           </div>
-        ) : null}
-      </div>
+        )}
+      </main>
 
       <Footer />
     </div>
   );
 }
-
-

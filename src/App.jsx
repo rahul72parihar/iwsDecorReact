@@ -27,6 +27,8 @@ import Orders from "./pages/User/Orders.jsx";
 import OrderDetails from "./pages/User/OrderDetails.jsx";
 import Addresses from "./pages/User/Addresses.jsx";
 import UserWishlist from "./pages/User/Wishlist.jsx";
+import Settings from "./pages/User/Settings.jsx";
+
 
 import SearchResults from "./pages/Search/SearchResults.jsx";
 
@@ -217,6 +219,16 @@ export default function App() {
               </ProtectedUserRoute>
             }
           />
+
+          <Route
+            path="/account/settings"
+            element={
+              <ProtectedUserRoute>
+                <Settings />
+              </ProtectedUserRoute>
+            }
+          />
+
 
           <Route
             path="/account/wishlist"
