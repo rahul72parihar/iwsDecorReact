@@ -1,0 +1,186 @@
+.adminReviewsCenter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  color: #666;
+  font-size: 16px;
+}
+
+.adminReviewsStats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.adminReviewsStat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+}
+
+.adminReviewsStat span {
+  color: #777;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.adminReviewsStat strong {
+  color: #111;
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+.adminReviewsNotice {
+  margin-bottom: 16px;
+}
+
+.adminReviewsToolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.adminReviewsFilter,
+.adminReviewsForm input,
+.adminReviewsForm select,
+.adminReviewsForm textarea,
+.adminReviewsStatusSelect {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fff;
+  color: #111;
+  font: inherit;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.adminReviewsFilter {
+  width: 180px;
+  text-transform: capitalize;
+}
+
+.adminReviewsFilter:focus,
+.adminReviewsForm input:focus,
+.adminReviewsForm select:focus,
+.adminReviewsForm textarea:focus,
+.adminReviewsStatusSelect:focus {
+  border-color: #111;
+}
+
+.adminReviewsTable {
+  overflow-x: auto;
+}
+
+.adminReviewsExcerpt {
+  max-width: 360px;
+  margin-top: 4px;
+  color: #777;
+  font-size: 13px;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.adminReviewsStars {
+  display: inline-block;
+  color: #b8872f;
+  font-size: 15px;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.adminReviewsStatusSelect {
+  min-width: 130px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.adminReviewsStatus--approved {
+  background: #f0fff4;
+  color: #2e7d32;
+  border-color: #cdeed8;
+}
+
+.adminReviewsStatus--pending {
+  background: #fff8e7;
+  color: #946500;
+  border-color: #ffe7a3;
+}
+
+.adminReviewsStatus--hidden {
+  background: #f3f7ff;
+  color: #2555a8;
+  border-color: #dbe7ff;
+}
+
+.adminReviewsStatus--rejected {
+  background: #fff2f2;
+  color: #d32f2f;
+  border-color: #ffd5d5;
+}
+
+.adminReviewsForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.adminReviewsFormRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.adminReviewsForm label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.adminReviewsForm label span {
+  color: #222;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.adminReviewsForm textarea {
+  min-height: 130px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .adminReviewsStats,
+  .adminReviewsFormRow {
+    grid-template-columns: 1fr;
+  }
+
+  .adminReviewsToolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .adminReviewsFilter {
+    width: 100%;
+  }
+
+  .adminReviewsTable table {
+    min-width: 860px;
+  }
+}

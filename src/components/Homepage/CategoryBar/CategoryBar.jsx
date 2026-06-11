@@ -24,7 +24,7 @@ function ProductCategoryMegaMenu({ category }) {
         <div className="mega-column" key={ci}>
           <h4>
               <Link
-                to={`/categories/${category.slug}`}
+                to={`/categories/${encodeURIComponent(category.label)}`}
               >
                 {category.label}
               </Link>
@@ -33,7 +33,7 @@ function ProductCategoryMegaMenu({ category }) {
           {col.map((sub) => (
             <Link
               key={sub.slug}
-              to={`/subcategories?subcategory=${encodeURIComponent(sub.label)}`}
+              to={`/categories/${encodeURIComponent(category.label)}?subcategory=${encodeURIComponent(sub.label)}`}
             >
               {sub.label}
             </Link>
@@ -120,11 +120,12 @@ function CategoryBar() {
         {dataCategories.map((cat) => (
           <div className="category-item" key={cat.slug}>
             <Link
-              to={`/products?category=${encodeURIComponent(cat.label)}`}
+              to={`/categories/${encodeURIComponent(cat.label)}`}
               className="category-link"
             >
               {cat.label}
             </Link>
+
             {cat.subcategories.length > 0 && (
               <ProductCategoryMegaMenu category={cat} />
             )}

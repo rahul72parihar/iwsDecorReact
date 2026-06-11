@@ -3,6 +3,10 @@
 .adminDashHead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px}
 .adminDashHead h1{margin:0;font-size:28px;letter-spacing:-.015em;font-weight:700}
 .adminDashHead p{margin:8px 0 0;color:#666;font-weight:650}
+.adminDashRefresh{border:1px solid #ddd;background:#fff;color:#111;padding:11px 16px;border-radius:10px;cursor:pointer;font-weight:700;white-space:nowrap}
+.adminDashRefresh:hover{background:#f7f7f7}
+.adminDashRefresh:disabled{opacity:.65;cursor:not-allowed}
+.adminDashError{margin-bottom:16px;padding:12px;border-radius:10px;background:#fff8e7;color:#946500;border:1px solid #ffe7a3;font-size:14px;font-weight:650}
 .adminDashGrid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
 .adminStat{grid-column:span 3;border:1px solid rgba(0,0,0,.08);background:#fff;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px}
 .adminStatTop{display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -10,6 +14,10 @@
 .adminStatLabel{color:#666;font-weight:650;font-size:12px;text-transform:uppercase;letter-spacing:.02em}
 .adminStatValue{font-size:26px;font-weight:700;letter-spacing:-.015em}
 .adminStatHint{color:#777;font-weight:650;font-size:12px}
+.adminRevenue{grid-column:span 12;border:1px solid rgba(0,0,0,.08);background:#fff;border-radius:14px;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.adminRevenue h2{margin:0 0 5px;font-size:16px;font-weight:700}
+.adminRevenue p{margin:0;color:#666;font-size:13px;font-weight:650}
+.adminRevenue strong{font-size:28px;letter-spacing:-.015em;color:#111;white-space:nowrap}
 .adminQuick{grid-column:span 6;border:1px solid rgba(0,0,0,.08);background:#fff;border-radius:14px;padding:14px}
 .adminQuick h2{margin:0 0 10px;font-size:16px;font-weight:700}
 .adminQuickList{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
@@ -26,7 +34,7 @@
 .adminActivityTitle{font-weight:700}
 .adminActivityMeta{color:#666;font-weight:650;font-size:12px;margin-top:2px}
 .adminActivityTime{color:#888;font-weight:650;font-size:12px;white-space:nowrap}
+.adminActivityEmpty{padding:18px 0;color:#777;font-size:14px;font-weight:650}
 
 @media (max-width: 1100px){.adminStat{grid-column:span 6}.adminQuick{grid-column:span 12}.adminActivity{grid-column:span 12}}
-@media (max-width: 680px){.adminDashGrid{gap:10px}.adminMain{padding:16px}.adminStat{grid-column:span 12}}
-
+@media (max-width: 680px){.adminDashGrid{gap:10px}.adminMain{padding:16px}.adminDashHead{flex-direction:column}.adminDashRefresh{width:100%}.adminStat{grid-column:span 12}.adminRevenue{align-items:flex-start;flex-direction:column}.adminRevenue strong{font-size:24px}}

@@ -1,4 +1,4 @@
-import { addDoc, collection, doc, getDocs, limit, orderBy, query, serverTimestamp, updateDoc, where } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, getDocs, limit, orderBy, query, serverTimestamp, updateDoc, where } from 'firebase/firestore';
 
 
 import db from './firestoreDb';
@@ -61,17 +61,37 @@ export async function markOrderPaid(orderId, { paid = true } = {}) {
   });
 }
 
+export async function listOrdersForAdmin({ pageSize = 100 } = {}) {
+  const q = query(getOrdersCol(), orderBy('createdAt', 'desc'), limit(pageSize));
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
+
+export async function getOrderByIdForAdmin(orderId) {
+  if (!orderId) return null;
+  const snap = await getDoc(doc(db, 'orders', orderId));
+  if (!snap.exists()) return null;
+  return { id: snap.id, ...snap.data() };
+}
+
+export async function updateOrderStatus(orderId, status) {
+  if (!orderId) throw new Error('Missing orderId');
+  if (!status) throw new Error('Missing status');
+
+  const ref = doc(db, 'orders', orderId);
+  await updateDoc(ref, {
+    status,
+    updatedAt: serverTimestamp(),
+  });
+}
+
 export async function getOrderByIdForUser(userUid, orderId) {
   if (!userUid || !orderId) return null;
 
-  const ref = doc(db, 'orders', orderId);
-  // Avoid exporting `getDoc` just for one call by using `getDocs` on a constrained query
-  // (keeps existing imports minimal, but still works reliably).
+  // Keep this constrained by userUid so users can only read their own orders.
   const q = query(collection(db, 'orders'), where('userUid', '==', userUid), where('__name__', '==', orderId));
   const snap = await getDocs(q);
   const doc0 = snap.docs[0];
   if (!doc0) return null;
   return { id: doc0.id, ...doc0.data() };
 }
-
-

@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
+
 
 import { useDispatch } from 'react-redux';
 
@@ -64,11 +66,14 @@ export default function SubcategoryProducts() {
   }, []);
 
   const params = new URLSearchParams(window.location.search);
-  const subcategory = params.get('subcategory');
+  const subcategoryFromQuery = params.get('subcategory');
 
+  const { subcategoryId } = useParams();
 
-  // Prefer subcategory from URL param; if not present, show empty results gracefully.
-  const normalizedSubcategory = (subcategory || '').trim();
+  // Prefer ?subcategory=...; if not present, fall back to :subcategoryId.
+  const normalizedSubcategory =
+    (subcategoryFromQuery || subcategoryId || '').trim();
+
 
   const filteredBySubcategory = useMemo(() => {
     if (!normalizedSubcategory) return [];

@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
+
 
 import { useDispatch } from 'react-redux';
 
@@ -69,9 +71,9 @@ export default function CategoryProducts() {
   const params = new URLSearchParams(window.location.search);
   const subcategory = (params.get('subcategory') || '').trim();
 
-  const pathParts = window.location.pathname.split('/').filter(Boolean);
-  const categoryIdFromPath = pathParts[pathParts.length - 1] || '';
-  const normalizedCategory = categoryIdFromPath.trim();
+  const { categoryId } = useParams();
+  const normalizedCategory = (categoryId || '').trim();
+
 
   const filteredByCategory = useMemo(() => {
     if (!normalizedCategory) return [];

@@ -13,6 +13,7 @@ function HeaderSidebar({ isOpen, onClose }) {
   const [categories, setCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
 
+  // Note: user/signOut are used only for the quick actions area.
   const { user, signOutUser } = useAuth();
 
   const totalQuantity = useSelector((s) => s.cart?.totalQuantity ?? 0);
@@ -138,7 +139,7 @@ function HeaderSidebar({ isOpen, onClose }) {
               {cat.subcategories.map((sc) => (
                 <Link
                   key={`${topKey}-${sc}`}
-                  to={`/subcategories/${encodeURIComponent(sc)}`}
+                  to={`/subcategories?subcategory=${encodeURIComponent(sc)}`}
                   onClick={handleNav}
                 >
                   {sc}

@@ -1,0 +1,247 @@
+.adminCustomersCenter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  color: #666;
+  font-size: 16px;
+}
+
+.adminCustomersStats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.adminCustomersStat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+}
+
+.adminCustomersStat span {
+  color: #777;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.adminCustomersStat strong {
+  color: #111;
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+.adminCustomersNotice {
+  margin-bottom: 16px;
+}
+
+.adminCustomersLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(340px, 0.65fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.adminCustomersListCard {
+  min-width: 0;
+}
+
+.adminCustomersToolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.adminCustomersFilter,
+.adminCustomersForm input,
+.adminCustomersForm select,
+.adminCustomersForm textarea {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fff;
+  color: #111;
+  font: inherit;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.adminCustomersFilter {
+  width: 180px;
+}
+
+.adminCustomersFilter:focus,
+.adminCustomersForm input:focus,
+.adminCustomersForm select:focus,
+.adminCustomersForm textarea:focus {
+  border-color: #111;
+}
+
+.adminCustomersTable {
+  overflow-x: auto;
+}
+
+.adminCustomersBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+  text-transform: capitalize;
+  background: #f4f4f4;
+  color: #555;
+  border: 1px solid #e5e5e5;
+}
+
+.adminCustomersBadge--active {
+  background: #f0fff4;
+  color: #2e7d32;
+  border-color: #cdeed8;
+}
+
+.adminCustomersBadge--blocked {
+  background: #fff2f2;
+  color: #d32f2f;
+  border-color: #ffd5d5;
+}
+
+.adminCustomersBadge--inactive {
+  background: #f6f6f6;
+  color: #777;
+  border-color: #e8e8e8;
+}
+
+.adminCustomersDetail {
+  position: sticky;
+  top: 24px;
+}
+
+.adminCustomersDetailEmpty {
+  padding: 28px 0;
+  text-align: center;
+  color: #777;
+}
+
+.adminCustomersDetailEmpty h2,
+.adminCustomersDetailHead h2 {
+  margin: 0 0 6px;
+  color: #111;
+  font-size: 20px;
+}
+
+.adminCustomersDetailEmpty p,
+.adminCustomersDetailHead p {
+  margin: 0;
+  color: #777;
+  font-size: 13px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.adminCustomersDetailHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.adminCustomersForm {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.adminCustomersForm label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.adminCustomersForm label span {
+  color: #222;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.adminCustomersForm textarea {
+  resize: vertical;
+  min-height: 96px;
+}
+
+.adminCustomersFormRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.adminCustomersMetrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.adminCustomersMetrics div {
+  padding: 12px;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  background: #fafafa;
+}
+
+.adminCustomersMetrics span {
+  display: block;
+  margin-bottom: 5px;
+  color: #777;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.adminCustomersMetrics strong {
+  color: #111;
+  font-size: 16px;
+}
+
+@media (max-width: 1100px) {
+  .adminCustomersLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .adminCustomersDetail {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .adminCustomersStats,
+  .adminCustomersFormRow,
+  .adminCustomersMetrics {
+    grid-template-columns: 1fr;
+  }
+
+  .adminCustomersToolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .adminCustomersFilter {
+    width: 100%;
+  }
+
+  .adminCustomersTable table {
+    min-width: 860px;
+  }
+}

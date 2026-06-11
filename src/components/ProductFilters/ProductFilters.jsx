@@ -227,7 +227,7 @@ export default function ProductFilters({
           </div>
         </div>
 
-        {/* <div className="filter-block">
+        <div className="filter-block">
           <div className="filter-label">Rating</div>
           <div className="rating-row">
             <input
@@ -247,9 +247,8 @@ export default function ProductFilters({
             />
             <div className="rating-value">{localRatingMin.toFixed(1)}+</div>
           </div>
-        </div> */}
+        </div>
       </div>
     </aside>
   );
 }
-
