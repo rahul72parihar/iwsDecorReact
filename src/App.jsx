@@ -8,7 +8,7 @@ import ProductDetails from "./pages/ProductDetails/ProductDetails.jsx";
 
 
 
-import SubcategoryProducts from "./pages/Subcategories/SubcategoryProducts.jsx";
+
 
 
 import Cart from "./pages/Cart/Cart.jsx";
@@ -34,7 +34,11 @@ import Settings from "./pages/User/Settings.jsx";
 
 import SearchResults from "./pages/Search/SearchResults.jsx";
 
+import CategoryPage from "./pages/CategoryPage/CategoryPage.jsx";
+import SubcategoryPage from "./pages/SubcategoryPage/SubcategoryPage.jsx";
+
 import BrassCollection from "./pages/Collections/BrassCollection.jsx";
+
 import Chandeliers from "./pages/Collections/Chandeliers.jsx";
 import PendantLights from "./pages/Collections/PendantLights.jsx";
 import WallLights from "./pages/Collections/WallLights.jsx";
@@ -104,23 +108,7 @@ export default function App() {
 
 
 
-          <Route
-            path="/subcategories"
-            element={
-              <ProtectedUserRoute>
-                <SubcategoryProducts />
-              </ProtectedUserRoute>
-            }
-          />
 
-          <Route
-            path="/subcategories/:subcategoryId"
-            element={
-              <ProtectedUserRoute>
-                <SubcategoryProducts />
-              </ProtectedUserRoute>
-            }
-          />
 
           <Route
             path="/cart"
@@ -236,7 +224,14 @@ export default function App() {
 
           <Route path="/search" element={<SearchResults />} />
 
+          <Route path="/category/:categorySlug" element={<CategoryPage />} />
+          <Route
+            path="/category/:categorySlug/:subcategorySlug"
+            element={<SubcategoryPage />}
+          />
+
           <Route path="/collections/brass" element={<BrassCollection />} />
+
           <Route path="/collections/chandeliers" element={<Chandeliers />} />
           <Route
             path="/collections/pendant-lights"

@@ -1,43 +1,39 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import "./CategoryBar.css";
 
+import { listCategories } from "../../../firebase/categoryService";
 
-import { listCategories } from '../../../firebase/categoryService';
-import { getCategorySubcategories } from '../../../firebase/subcategoryService';
-
-// Build nav structure from Firestore category docs
-const toSlug = (str) =>
+const toSlug = (str = "") =>
   str.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
 
+const normalizeSlug = (str = "") => toSlug(str);
 
-// Split product categories into groups of ~3 for multi-column mega menus
+
 const chunkArray = (arr, size) => {
   const chunks = [];
-  for (let i = 0; i < arr.length; i += size) chunks.push(arr.slice(i, i + size));
+  for (let i = 0; i < arr.length; i += size) {
+    chunks.push(arr.slice(i, i + size));
+  }
   return chunks;
 };
 
 function ProductCategoryMegaMenu({ category }) {
   const columns = chunkArray(category.subcategories, 4);
+
   return (
     <div className="mega-menu">
       {columns.map((col, ci) => (
         <div className="mega-column" key={ci}>
           <h4>
-              <Link
-                to={`/subcategories`}
-              >
-                {category.label}
-              </Link>
-
+            <Link to={`/category/${category.slug}`}>{category.label}</Link>
           </h4>
+
           {col.map((sub) => (
             <Link
               key={sub.slug}
-              to={`/subcategories?subcategory=${encodeURIComponent(String(sub.label))}`}
+              to={`/category/${category.slug}/${sub.slug}`}
             >
-
               {sub.label}
             </Link>
           ))}
@@ -48,94 +44,62 @@ function ProductCategoryMegaMenu({ category }) {
   );
 }
 
-
-
 function CategoryBar() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    let alive = true;
-    const run = async () => {
-      setLoading(true);
-      setError('');
+    let mounted = true;
+
+    const loadCategories = async () => {
       try {
-        const list = await listCategories();
-        if (!alive) return;
-        setCategories(list);
-      } catch (e) {
-        if (!alive) return;
-        setError(e?.message || 'Failed to load categories');
-        setCategories([]);
+        setLoading(true);
+
+        const data = await listCategories();
+
+        if (!mounted) return;
+
+        setCategories(data || []);
+      } catch (err) {
+        if (!mounted) return;
+
+        setError(err?.message || "Failed to load categories");
       } finally {
-        if (!alive) return;
+        if (!mounted) return;
+
         setLoading(false);
       }
     };
-    run();
+
+    loadCategories();
+
     return () => {
-      alive = false;
+      mounted = false;
     };
   }, []);
 
-  const [subcategoriesByCategoryId, setSubcategoriesByCategoryId] = useState({});
-
-  useEffect(() => {
-    let alive = true;
-    const run = async () => {
-      if (!categories.length) {
-        setSubcategoriesByCategoryId({});
-        return;
-      }
-
-      const entries = await Promise.all(
-        categories.map(async (c) => {
-          const subs = await getCategorySubcategories(c.id);
-          return [c.id, Array.isArray(subs) ? subs : []];
-        }),
-      );
-
-      if (!alive) return;
-      setSubcategoriesByCategoryId(Object.fromEntries(entries));
-    };
-
-    run();
-    return () => {
-      alive = false;
-    };
-  }, [categories]);
-
   const dataCategories = useMemo(() => {
     return categories
-      .map((c) => {
-        const label = (c?.label || c?.name || '').trim();
-        if (!label) return null;
+      .map((cat) => ({
+        id: cat.id,
+        label: cat.name || cat.label,
+        slug: cat.slug || normalizeSlug(cat.name || cat.label),
 
-        const subcats = subcategoriesByCategoryId[c.id] || [];
+        subcategories: (cat.subcategories || []).map((sub) => ({
+          label: sub,
+          slug: normalizeSlug(sub),
+        })),
+      }))
+      .filter((cat) => cat.label);
+  }, [categories]);
 
-        const slug = (c?.slug || toSlug(label)).trim();
-
-        return {
-          id: c.id,
-          label,
-          slug,
-          subcategories: subcats
-            .filter(Boolean)
-            .map((sub) => ({
-              label: sub,
-              slug: toSlug(sub),
-            })),
-        };
-      })
-      .filter(Boolean);
-  }, [categories, subcategoriesByCategoryId]);
 
   if (loading) {
     return (
       <div className="category-bar">
-        <div className="category-container" style={{ padding: 16, fontWeight: 800, textAlign: 'center' }}>
-          Loading categories…
+        <div className="category-container">
+          Loading categories...
         </div>
       </div>
     );
@@ -144,7 +108,10 @@ function CategoryBar() {
   if (error) {
     return (
       <div className="category-bar">
-        <div className="category-container" style={{ padding: 16, fontWeight: 800, textAlign: 'center', color: '#b00020' }}>
+        <div
+          className="category-container"
+          style={{ color: "#b00020" }}
+        >
           {error}
         </div>
       </div>
@@ -155,25 +122,22 @@ function CategoryBar() {
     <div className="category-bar">
       <div className="category-container">
         {dataCategories.map((cat) => (
-          <div className="category-item" key={cat.slug}>
+          <div className="category-item" key={cat.id}>
             <Link
-              to={`/subcategories`}
+              to={`/category/${cat.slug}`}
               className="category-link"
             >
               {cat.label}
             </Link>
 
-
-            {cat.subcategories?.length > 0 && (
-            <ProductCategoryMegaMenu category={cat} />
-          )}
-
+            {cat.subcategories.length > 0 && (
+              <ProductCategoryMegaMenu category={cat} />
+            )}
           </div>
         ))}
       </div>
     </div>
   );
 }
-
 
 export default CategoryBar;

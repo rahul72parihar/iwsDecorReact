@@ -4,11 +4,13 @@ import {
   getDoc,
   getDocs,
   query,
+  where,
   deleteDoc,
   setDoc,
   getCountFromServer,
   orderBy,
 } from 'firebase/firestore';
+
 
 import db from './firestoreDb.js';
 
@@ -36,6 +38,17 @@ export async function listCategories() {
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 }
 
+// NOTE: kept for backward-compat with earlier/alternate callers
+export async function getCategories() {
+  const snapshot = await getDocs(collection(db, 'categories'));
+
+  return snapshot.docs.map((docSnap) => ({
+    id: docSnap.id,
+    ...docSnap.data(),
+  }));
+}
+
+
 export async function getCategoryCount() {
   const snap = await getCountFromServer(categoriesCollection());
   return snap.data().count;
@@ -50,8 +63,38 @@ export async function getCategory(categoryId) {
 }
 
 /**
+ * Get a category document by its slug field.
+ * Slug is expected to be stored as `slug` inside each category document.
+ */
+export async function getCategoryBySlug(slug) {
+  if (!slug) return null;
+
+  const normalized = String(slug).trim();
+
+  // NOTE: categories are likely small; we do a query by slug
+  // instead of requiring docId==slug.
+  const q = query(categoriesCollection(), where('slug', '==', normalized));
+
+  const snap = await getDocs(q);
+  if (snap.empty) return null;
+
+  const docSnap = snap.docs[0];
+  return { id: docSnap.id, ...docSnap.data() };
+}
+
+
+
+
+
+
+
+
+
+/**
  * Upsert category.
  * - categoryId is the document id.
+
+
  * - data is merged.
  */
 export async function createOrUpdateCategory(categoryId, data) {

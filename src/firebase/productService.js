@@ -10,6 +10,7 @@ import {
   setDoc,
   deleteDoc,
   getCountFromServer,
+  where,
 } from 'firebase/firestore';
 
 import db from './firestoreDb.js';
@@ -31,6 +32,50 @@ export async function listProducts() {
 }
 
 /**
+ * Fetch products by category name.
+ *
+ * Firestore fields:
+ * - category: category name (e.g. "Chandeliers")
+ */
+export async function getProductsByCategory(categoryName) {
+  if (!categoryName) return [];
+
+  const q = query(productsCollection(), where('category', '==', categoryName));
+  const snap = await getDocs(q);
+
+  if (!snap.empty) {
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  }
+
+  return [];
+}
+
+/**
+ * Fetch products by category name and subcategory name.
+ *
+ * Firestore fields:
+ * - category: category name (e.g. "Chandeliers")
+ * - subcategory: subcategory name (e.g. "Crystal")
+ */
+export async function getProductsBySubcategory(categoryName, subcategoryName) {
+  if (!categoryName || !subcategoryName) return [];
+
+  const q = query(
+    productsCollection(),
+    where('category', '==', categoryName),
+    where('subcategory', '==', subcategoryName)
+  );
+
+  const snap = await getDocs(q);
+
+  if (!snap.empty) {
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  }
+
+  return [];
+}
+
+/**
  * Fetch a single page of products.
  *
  * @param {object}  options
@@ -45,14 +90,7 @@ export async function listProducts() {
  *   items: object[],
  *   cursor: import('firebase/firestore').QueryDocumentSnapshot | null,
  *   hasMore: boolean,
- * }>}
- *
- * Usage:
- *   // Page 1
- *   const page1 = await listProductsPaginated({ pageSize: 10 });
- *
- *   // Page 2 — pass the cursor returned from page 1
- *   const page2 = await listProductsPaginated({ pageSize: 10, after: page1.cursor });
+ * }>} 
  */
 export async function listProductsPaginated({
   pageSize = 10,
@@ -105,7 +143,7 @@ export async function createOrUpdateProduct(productId, data) {
   await setDoc(
     ref,
     { ...data, id: data.id ?? productId },
-    { merge: true },
+    { merge: true }
   );
   return getProduct(productId);
 }
@@ -115,3 +153,4 @@ export async function deleteProduct(productId) {
   const ref = doc(db, PRODUCTS_COLLECTION, productId);
   await deleteDoc(ref);
 }
+

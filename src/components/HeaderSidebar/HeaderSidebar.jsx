@@ -145,7 +145,7 @@ function HeaderSidebar({ isOpen, onClose }) {
               {cat.subcategories.map((sc) => (
                 <Link
                   key={`${topKey}-${sc}`}
-                  to={`/subcategories?subcategory=${encodeURIComponent(sc)}`}
+                  to="/products"
                   onClick={handleNav}
                 >
                   {sc}
