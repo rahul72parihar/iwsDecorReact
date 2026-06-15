@@ -6,8 +6,10 @@ import Home from "./pages/Home/Home.jsx";
 import Products from "./pages/Products/Products.jsx";
 import ProductDetails from "./pages/ProductDetails/ProductDetails.jsx";
 
-import CategoryProducts from "./pages/Categories/CategoryProducts.jsx";
+
+
 import SubcategoryProducts from "./pages/Subcategories/SubcategoryProducts.jsx";
+
 
 import Cart from "./pages/Cart/Cart.jsx";
 import Wishlist from "./pages/Wishlist/Wishlist.jsx";
@@ -100,14 +102,7 @@ export default function App() {
             }
           />
 
-          <Route
-            path="/categories/:categoryId"
-            element={
-              <ProtectedUserRoute>
-                <CategoryProducts />
-              </ProtectedUserRoute>
-            }
-          />
+
 
           <Route
             path="/subcategories"

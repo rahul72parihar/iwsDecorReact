@@ -2,9 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from "react-router-dom";
 import "./CategoryBar.css";
 
-import { listProducts } from '../../../firebase/productService';
 
-// Build nav structure directly from product data
+import { listCategories } from '../../../firebase/categoryService';
+import { getCategorySubcategories } from '../../../firebase/subcategoryService';
+
+// Build nav structure from Firestore category docs
 const toSlug = (str) =>
   str.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
 
@@ -24,7 +26,7 @@ function ProductCategoryMegaMenu({ category }) {
         <div className="mega-column" key={ci}>
           <h4>
               <Link
-                to={`/categories/${encodeURIComponent(category.label)}`}
+                to={`/subcategories`}
               >
                 {category.label}
               </Link>
@@ -33,8 +35,9 @@ function ProductCategoryMegaMenu({ category }) {
           {col.map((sub) => (
             <Link
               key={sub.slug}
-              to={`/categories/${encodeURIComponent(category.label)}?subcategory=${encodeURIComponent(sub.label)}`}
+              to={`/subcategories?subcategory=${encodeURIComponent(String(sub.label))}`}
             >
+
               {sub.label}
             </Link>
           ))}
@@ -48,7 +51,7 @@ function ProductCategoryMegaMenu({ category }) {
 
 
 function CategoryBar() {
-  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -58,13 +61,13 @@ function CategoryBar() {
       setLoading(true);
       setError('');
       try {
-        const list = await listProducts();
+        const list = await listCategories();
         if (!alive) return;
-        setProducts(list);
+        setCategories(list);
       } catch (e) {
         if (!alive) return;
         setError(e?.message || 'Failed to load categories');
-        setProducts([]);
+        setCategories([]);
       } finally {
         if (!alive) return;
         setLoading(false);
@@ -76,23 +79,57 @@ function CategoryBar() {
     };
   }, []);
 
-  const dataCategories = useMemo(() => {
-    const map = {};
-    products.forEach(({ category, subcategory }) => {
-      if (!category) return;
-      if (!map[category]) map[category] = new Set();
-      if (subcategory) map[category].add(subcategory);
-    });
+  const [subcategoriesByCategoryId, setSubcategoriesByCategoryId] = useState({});
 
-    return Object.entries(map).map(([category, subs]) => ({
-      label: category,
-      slug: toSlug(category),
-      subcategories: [...subs].map((sub) => ({
-        label: sub,
-        slug: toSlug(sub),
-      })),
-    }));
-  }, [products]);
+  useEffect(() => {
+    let alive = true;
+    const run = async () => {
+      if (!categories.length) {
+        setSubcategoriesByCategoryId({});
+        return;
+      }
+
+      const entries = await Promise.all(
+        categories.map(async (c) => {
+          const subs = await getCategorySubcategories(c.id);
+          return [c.id, Array.isArray(subs) ? subs : []];
+        }),
+      );
+
+      if (!alive) return;
+      setSubcategoriesByCategoryId(Object.fromEntries(entries));
+    };
+
+    run();
+    return () => {
+      alive = false;
+    };
+  }, [categories]);
+
+  const dataCategories = useMemo(() => {
+    return categories
+      .map((c) => {
+        const label = (c?.label || c?.name || '').trim();
+        if (!label) return null;
+
+        const subcats = subcategoriesByCategoryId[c.id] || [];
+
+        const slug = (c?.slug || toSlug(label)).trim();
+
+        return {
+          id: c.id,
+          label,
+          slug,
+          subcategories: subcats
+            .filter(Boolean)
+            .map((sub) => ({
+              label: sub,
+              slug: toSlug(sub),
+            })),
+        };
+      })
+      .filter(Boolean);
+  }, [categories, subcategoriesByCategoryId]);
 
   if (loading) {
     return (
@@ -120,15 +157,17 @@ function CategoryBar() {
         {dataCategories.map((cat) => (
           <div className="category-item" key={cat.slug}>
             <Link
-              to={`/categories/${encodeURIComponent(cat.label)}`}
+              to={`/subcategories`}
               className="category-link"
             >
               {cat.label}
             </Link>
 
-            {cat.subcategories.length > 0 && (
-              <ProductCategoryMegaMenu category={cat} />
-            )}
+
+            {cat.subcategories?.length > 0 && (
+            <ProductCategoryMegaMenu category={cat} />
+          )}
+
           </div>
         ))}
       </div>

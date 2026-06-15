@@ -19,7 +19,8 @@ export async function createOrder({ userUid, shippingAddress, paymentMethod, ite
     items: Array.isArray(items) ? items : [],
     totals: totals ?? {},
 
-    status: 'placed',
+    status: paymentMethod === 'online_demo' ? 'pending' : 'placed',
+
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   };

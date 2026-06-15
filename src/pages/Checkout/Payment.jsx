@@ -2,12 +2,15 @@ import { useMemo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
+import useAuth from '../../auth/useAuth';
+import { createOrder, markOrderPaid } from '../../firebase/orderService';
+import { getCheckoutSession, clearCheckoutSession } from './CheckoutUtils';
 
 import { clearCart } from '../../features/cart/cartSlice';
+import { computeCheckoutTotals } from './paymentAmount';
+import { getCreateRazorpayOrderUrl, getVerifyRazorpayPaymentUrl } from '../../firebase/razorpayClient';
 
-import useAuth from '../../auth/useAuth';
-import { createOrder } from '../../firebase/orderService';
-import { getCheckoutSession, clearCheckoutSession } from './CheckoutUtils';
+
 
 export default function Payment() {
   const { user, loading } = useAuth();
@@ -17,16 +20,14 @@ export default function Payment() {
   const cart = useSelector((s) => s.cart);
 
   const [paymentMethod, setPaymentMethod] = useState('cod'); // cod | online
+
   const [placing, setPlacing] = useState(false);
   const [error, setError] = useState('');
 
   const breakdown = useMemo(() => {
-    const subtotal = cart.totalPrice;
-    const shipping = subtotal > 0 ? 299 : 0;
-    const tax = subtotal > 0 ? Math.round(subtotal * 0.05) : 0;
-    const total = subtotal + shipping + tax;
-    return { subtotal, shipping, tax, total };
+    return computeCheckoutTotals(cart.totalPrice);
   }, [cart.totalPrice]);
+
 
   const session = useMemo(() => getCheckoutSession(), []);
   const selectedAddress = session?.selectedAddress ?? null;
@@ -62,17 +63,126 @@ export default function Payment() {
         paymentMethod: paymentMethodLabel,
         items: cart.items,
         totals: breakdown,
+        // orderService decides status for online_demo
       });
 
-      // In this app we treat both methods as "placed" immediately.
-      // (Hooking real payments can be done later.)
+      // CASH ON DELIVERY: mark as placed immediately (current behavior)
+      if (paymentMethod === 'cod') {
+        dispatch(clearCart());
+        clearCheckoutSession();
+        navigate(`/checkout/success?orderId=${encodeURIComponent(orderId)}`);
+        return;
+      }
+
+      // ONLINE (Razorpay)
+      const amountINR = breakdown.total;
+
+      const createUrl = getCreateRazorpayOrderUrl();
+      const verifyUrl = getVerifyRazorpayPaymentUrl();
+
+      const createResp = await fetch(createUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId, amountINR }),
+      });
+
+      if (!createResp.ok) {
+        let payloadText = '';
+        try {
+          // Prefer JSON payload if it exists, but fall back to raw text.
+          const contentType = createResp.headers.get('content-type') || '';
+          if (contentType.includes('application/json')) {
+            const j = await createResp.json();
+            payloadText = j?.error ? String(j.error) : JSON.stringify(j);
+          } else {
+            payloadText = await createResp.text().catch(() => '');
+          }
+        } catch {
+          payloadText = '';
+        }
+
+        throw new Error(`Razorpay order creation failed: ${payloadText || createResp.statusText || createResp.status}`);
+      }
+
+      const { razorpayOrderId } = await createResp.json();
+
+
+      if (!razorpayOrderId) throw new Error('Missing razorpayOrderId');
+
+      if (!window.Razorpay) {
+        throw new Error('Razorpay SDK not loaded.');
+      }
+
+      await new Promise((resolve, reject) => {
+        const options = {
+          key: import.meta?.env?.VITE_RAZORPAY_KEY_ID,
+          amount: breakdown.total * 100,
+          currency: 'INR',
+          name: 'iwsdecorreact',
+          description: 'Order Payment',
+          order_id: razorpayOrderId,
+          handler: async function (response) {
+            try {
+              const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = response;
+
+              const verifyResp = await fetch(verifyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  orderId,
+                  razorpay_order_id,
+                  razorpay_payment_id,
+                  razorpay_signature,
+                }),
+              });
+
+              if (!verifyResp.ok) {
+                const txt = await verifyResp.text().catch(() => '');
+                throw new Error(`Payment verification failed: ${txt}`);
+              }
+
+              const verifyJson = await verifyResp.json().catch(() => ({}));
+              if (!verifyJson?.ok) {
+                // backend should return {ok:true}
+                // eslint-disable-next-line prefer-promise-reject-errors
+                throw new Error('Payment verification unsuccessful.');
+              }
+
+              resolve();
+            } catch (err) {
+              reject(err);
+            }
+          },
+          prefill: {
+            name: selectedAddress.fullName,
+            contact: selectedAddress.phone,
+          },
+          notes: {
+            orderId,
+          },
+          theme: { color: '#1d1815' },
+        };
+
+        const rzp = new window.Razorpay(options);
+        rzp.on('payment.failed', function (resp) {
+          reject(new Error(resp?.error?.description || 'Payment failed'));
+        });
+        rzp.open();
+      });
 
       dispatch(clearCart());
       clearCheckoutSession();
       navigate(`/checkout/success?orderId=${encodeURIComponent(orderId)}`);
+
     } catch (e) {
       console.error(e);
-      setError('Could not place the order. Please try again.');
+      const msg =
+        e?.message ||
+        (typeof e === 'string' ? e : '') ||
+        (e?.error ? String(e.error) : '');
+
+      // Keep UI user-friendly but include the real server/client failure reason when available.
+      setError(msg ? `Could not place the order. ${msg}` : 'Could not place the order. Please try again.');
     } finally {
       setPlacing(false);
     }
@@ -118,8 +228,10 @@ export default function Payment() {
                   : '1px solid rgba(0,0,0,0.08)',
               background: paymentMethod === 'cod' ? 'rgba(0,0,0,0.02)' : 'transparent',
               cursor: 'pointer',
+              opacity: placing ? 0.65 : 1,
             }}
           >
+
             <input
               type="radio"
               name="paymentMethod"
@@ -216,8 +328,9 @@ export default function Payment() {
       </div>
 
       <div style={{ marginTop: 10, color: 'rgba(29,24,21,0.65)', fontWeight: 800, fontSize: 12 }}>
-        Payment processing is simulated (no external payment gateway wired yet).
+        COD places the order immediately. Online uses Razorpay (server-side) and marks the order as paid after verification.
       </div>
+
     </div>
   );
 }

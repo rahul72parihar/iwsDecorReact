@@ -40,7 +40,7 @@ function Categories() {
         {categories.map((category) => (
           <Link
             key={category.id}
-            to={`/products?category=${encodeURIComponent(category.name)}`}
+            to={`/categories/${encodeURIComponent(category.name.toLowerCase().replace(/\s+/g, '-'))}`}
             className="cat-card"
           >
             <div

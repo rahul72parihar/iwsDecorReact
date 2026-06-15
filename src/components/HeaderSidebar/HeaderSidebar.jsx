@@ -52,10 +52,16 @@ function HeaderSidebar({ isOpen, onClose }) {
     };
   }, [isOpen]);
 
+  const toSlug = (str) =>
+    String(str || '')
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '');
+
   const categoryItems = useMemo(() => {
     return (categories || []).map((c) => {
-      const name = c?.name || '';
-      const slug = c?.slug || '';
+      const name = (c?.name || c?.label || '').trim();
+      const slug = (c?.slug || toSlug(name)).trim();
       const subcategories = Array.isArray(c?.subcategories) ? c.subcategories : [];
 
       return {

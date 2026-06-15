@@ -33,7 +33,7 @@ export async function createReview(data) {
     customerEmail: (data.customerEmail || '').trim(),
     rating: Number(data.rating) || 5,
     text: (data.text || '').trim(),
-    status: data.status || 'pending',
+    status: data.status || 'approved',
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   };
@@ -41,6 +41,24 @@ export async function createReview(data) {
   const ref = await addDoc(reviewsCollection(), payload);
   return ref.id;
 }
+
+export async function listApprovedReviewsForProduct(productId, { pageSize = 100 } = {}) {
+  if (!productId) return [];
+
+  const q = query(
+    reviewsCollection(),
+    orderBy('createdAt', 'desc'),
+    limit(pageSize)
+  );
+
+  // Firestore doesn't support !=/== for nested combos without composite index.
+  // We'll filter in memory (acceptable for small review sets).
+  const snap = await getDocs(q);
+  return snap.docs
+    .map((d) => ({ id: d.id, ...d.data() }))
+    .filter((r) => r.productId === productId && r.status === 'approved');
+}
+
 
 export async function updateReview(reviewId, data) {
   if (!reviewId) throw new Error('Missing reviewId');
