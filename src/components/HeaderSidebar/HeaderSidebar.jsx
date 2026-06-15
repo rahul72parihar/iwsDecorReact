@@ -19,9 +19,6 @@ function HeaderSidebar({ isOpen, onClose }) {
   const totalQuantity = useSelector((s) => s.cart?.totalQuantity ?? 0);
   const wishlistCount = useSelector((s) => s.wishlist?.items?.length ?? 0);
 
-
-
-
   const toggleMenu = (menu) => {
     setOpenMenu(openMenu === menu ? null : menu);
   };
@@ -53,16 +50,18 @@ function HeaderSidebar({ isOpen, onClose }) {
   }, [isOpen]);
 
   const toSlug = (str) =>
-    String(str || '')
+    String(str || "")
       .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9-]/g, '');
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "");
 
   const categoryItems = useMemo(() => {
     return (categories || []).map((c) => {
-      const name = (c?.name || c?.label || '').trim();
+      const name = (c?.name || c?.label || "").trim();
       const slug = (c?.slug || toSlug(name)).trim();
-      const subcategories = Array.isArray(c?.subcategories) ? c.subcategories : [];
+      const subcategories = Array.isArray(c?.subcategories)
+        ? c.subcategories
+        : [];
 
       return {
         id: c?.id || slug,
@@ -105,7 +104,7 @@ function HeaderSidebar({ isOpen, onClose }) {
         return (
           <Link
             key={topKey}
-            to={`/categories/${cat.slug}`}
+            to={`/category/${cat.slug}`}
             className="header-sidebar__link"
             onClick={handleNav}
           >
@@ -134,7 +133,8 @@ function HeaderSidebar({ isOpen, onClose }) {
             <div className="header-sidebar__mega-column">
               {/* Main category */}
               <Link
-                to={`/categories/${cat.slug}`}
+                to={`/category
+  /${cat.slug}`}
                 onClick={handleNav}
                 style={{ fontWeight: 800 }}
               >
@@ -145,7 +145,7 @@ function HeaderSidebar({ isOpen, onClose }) {
               {cat.subcategories.map((sc) => (
                 <Link
                   key={`${topKey}-${sc}`}
-                  to="/products"
+                  to={`/category/${cat.slug}/${toSlug(sc)}`}
                   onClick={handleNav}
                 >
                   {sc}
@@ -248,5 +248,3 @@ function HeaderSidebar({ isOpen, onClose }) {
 }
 
 export default HeaderSidebar;
-
-
